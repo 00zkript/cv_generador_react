@@ -1,9 +1,9 @@
 import cvService from "@/services/cvService";
 import { CvBaseSchema } from "@/types/Cv";
 import { SkillBaseSchema } from "@/types/Skill";
-import { WorkExperienceBaseSchema } from "@/types/WorkExperience";
+import { WorkExperienceBase, WorkExperienceBaseSchema } from "@/types/WorkExperience";
 import useFormCv from "@/hooks/useFormCv";
-import { StudyBaseSchema } from "@/types/Study";
+import { StudyBase, StudyBaseSchema } from "@/types/Study";
 import { LanguageBaseSchema } from "@/types/Laguage";
 import { toast } from "react-toastify";
 import { ZodSchema } from "zod";
@@ -11,6 +11,7 @@ import { useParams } from "react-router";
 import { useEffect } from "react";
 import { ContactBaseSchema } from "@/types/Contact";
 import useErrors from "./useError";
+import { format } from "@formkit/tempo";
 
 
 function useFormUpdate() {
@@ -53,10 +54,18 @@ function useFormUpdate() {
                 country: data.contact.country,
             });
 
-            
+
             useFormInstance.setSkills(data.skills)
-            useFormInstance.setWorksExperiences(data.works_experiences)
-            useFormInstance.setStudies(data.studies)
+            useFormInstance.setWorksExperiences(data.works_experiences.map((work: WorkExperienceBase) => ({
+                ...work,
+                start_date: work.start_date ? format(work.start_date, 'YYYY-MM-DD') : null,
+                end_date: work.end_date ? format(work.end_date, 'YYYY-MM-DD') : null,
+            })))
+            useFormInstance.setStudies(data.studies.map((study: StudyBase) => ({
+                ...study,
+                start_date: study.start_date ? format(study.start_date, 'YYYY-MM-DD') : null,
+                end_date: study.end_date ? format(study.end_date, 'YYYY-MM-DD') : null,
+            })))
             useFormInstance.setLanguages(data.languages)
 
         } catch (error) {
@@ -67,20 +76,20 @@ function useFormUpdate() {
 
     const makeRequest = () => {
         const errors: string[] = [];
-    
-         // Función auxiliar para validar y formatear errores
+
+        // Función auxiliar para validar y formatear errores
         const validateField = <T,>(schema: ZodSchema<T>, value: T, fieldName: string) => {
             const result = schema.safeParse(value);
             if (!result.success) {
                 const errorsFound = result.error.errors;
-                const messages = errorsFound.map((err) => fieldName+' : '+err.path.join(' > ')+ ' - ' + err.message);
-                const uniqueMessages = [...new Set( messages ) ];
+                const messages = errorsFound.map((err) => fieldName + ' : ' + err.path.join(' > ') + ' - ' + err.message);
+                const uniqueMessages = [...new Set(messages)];
                 // errors.push(`${fieldName} tiene errores:\n${uniqueMessages}`);
                 errors.concat(uniqueMessages);
             }
         };
-    
-    
+
+
         // Validaciones
         validateField(CvBaseSchema, useFormInstance.cv, "CV");
         validateField(ContactBaseSchema, useFormInstance.contact, "Contacto");
@@ -92,7 +101,7 @@ function useFormUpdate() {
         if (errors.length > 0) {
             return { success: false, errors };
         }
-    
+
         return {
             success: true,
             data: {
@@ -105,7 +114,7 @@ function useFormUpdate() {
             },
         };
     };
-        
+
     const handleSaveForm = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
 
@@ -122,12 +131,12 @@ function useFormUpdate() {
         } catch (error) {
             handleErrorsRequest(error);
         }
-    };     
+    };
 
-    
+
     useEffect(() => {
         getCv();
-        
+
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
