@@ -1,0 +1,20 @@
+{
+    "singleQuote": true,
+    "semi": true,
+    "useTabs": false,
+    "tabWidth": 4,
+    "printWidth": 80,
+    "bracketSpacing": true,
+    "trailingComma": "es5",
+    "jsxBracketSameLine": false,
+    "proseWrap": "preserve",
+    "overrides": [
+        {
+            "files": "*.html",
+            "options": {
+                "printWidth": 200,
+                "htmlWhitespaceSensitivity": "ignore"
+            }
+        }
+    ]
+}
