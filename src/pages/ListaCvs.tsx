@@ -18,6 +18,7 @@ import {
     DialogHeader,
 } from '@/components/ui/dialog';
 import ModalVer from '@/components/listCvs/ModalVer';
+import DialogConfirm from '@/components/DialogConfirm';
 
 export default function ListaCvs() {
     const [dataPage, setDataPage] = useState<{
@@ -40,6 +41,7 @@ export default function ListaCvs() {
     const [modalOpen, setModalOpen] = useState<boolean>(false);
     const [errorModal, setErrorModal] = useState<string | null>(null);
     const [modalData, setModalData] = useState<object | null>(null);
+    const [openConfirm, setOpenConfirm] = useState<boolean>(false);
 
     const getCvs = async (page = 1) => {
         try {
@@ -138,11 +140,22 @@ export default function ListaCvs() {
             />
 
             <ModalVer
-                modalOpen={modalOpen}
-                setModalOpen={setModalOpen}
+                open={modalOpen}
+                setOpen={setModalOpen}
                 loadingModal={loadingModal}
                 errorModal={errorModal}
                 modalData={modalData}
+            />
+
+            <Button variant={'default'} onClick={() => setOpenConfirm(true)}>
+                Confirm
+            </Button>
+
+            <DialogConfirm
+                open={openConfirm}
+                setOpen={setOpenConfirm}
+                confirm={() => setOpenConfirm(false)}
+                cancel={() => setOpenConfirm(false)}
             />
         </Page>
     );

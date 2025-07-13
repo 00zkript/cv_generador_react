@@ -9,22 +9,22 @@ import {
 import { Button } from '../ui/button';
 
 export interface ModalVerType {
-    modalOpen: boolean;
-    setModalOpen: (open: boolean) => void;
+    open: boolean;
+    setOpen: (open: boolean) => void;
     loadingModal: boolean | null;
     errorModal: string | null;
     modalData: object | null;
 }
 
 function ModalVer({
-    modalOpen,
-    setModalOpen,
+    open: open,
+    setOpen: setOpen,
     loadingModal,
     errorModal,
     modalData,
 }: ModalVerType) {
     return (
-        <Dialog open={modalOpen} onOpenChange={setModalOpen}>
+        <Dialog open={open} onOpenChange={setOpen}>
             <DialogContent>
                 <DialogHeader>
                     <DialogTitle>Detalle del CV</DialogTitle>
@@ -53,10 +53,7 @@ function ModalVer({
                     >
                         Copiar
                     </Button>
-                    <Button
-                        variant="secondary"
-                        onClick={() => setModalOpen(false)}
-                    >
+                    <Button variant="secondary" onClick={() => setOpen(false)}>
                         Cerrar
                     </Button>
                 </DialogFooter>
