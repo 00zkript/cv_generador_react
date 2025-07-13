@@ -17,6 +17,7 @@ import {
     DialogFooter,
     DialogHeader,
 } from '@/components/ui/dialog';
+import ModalVer from '@/components/listCvs/ModalVer';
 
 export default function ListaCvs() {
     const [dataPage, setDataPage] = useState<{
@@ -136,46 +137,13 @@ export default function ListaCvs() {
                 limit={5}
             />
 
-            <Dialog open={modalOpen} onOpenChange={setModalOpen}>
-                <DialogContent>
-                    <DialogHeader>
-                        <DialogTitle>Detalle del CV</DialogTitle>
-                        <DialogDescription>
-                            {loadingModal && 'Cargando...'}
-                            {errorModal && (
-                                <span className="text-red-500">
-                                    {errorModal}
-                                </span>
-                            )}
-                        </DialogDescription>
-                    </DialogHeader>
-                    {modalData && (
-                        <pre className="bg-gray-100 dark:bg-gray-800 p-2 rounded text-xs max-h-64 overflow-auto">
-                            {JSON.stringify(modalData, null, 2)}
-                        </pre>
-                    )}
-                    <DialogFooter>
-                        <Button
-                            onClick={() => {
-                                if (modalData) {
-                                    navigator.clipboard.writeText(
-                                        JSON.stringify(modalData, null, 2)
-                                    );
-                                }
-                            }}
-                            disabled={!modalData}
-                        >
-                            Copiar
-                        </Button>
-                        <Button
-                            variant="secondary"
-                            onClick={() => setModalOpen(false)}
-                        >
-                            Cerrar
-                        </Button>
-                    </DialogFooter>
-                </DialogContent>
-            </Dialog>
+            <ModalVer
+                modalOpen={modalOpen}
+                setModalOpen={setModalOpen}
+                loadingModal={loadingModal}
+                errorModal={errorModal}
+                modalData={modalData}
+            />
         </Page>
     );
 }
