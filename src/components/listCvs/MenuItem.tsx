@@ -1,4 +1,4 @@
-import { CvList } from '@/types/Cv';
+import { CvItem } from '@/types/Cv';
 import {
     DropdownMenu,
     DropdownMenuContent,
@@ -8,6 +8,7 @@ import {
 import { Button } from '../ui/button';
 import {
     Ellipsis,
+    Eye,
     FilePenLine,
     FileStack,
     FileText,
@@ -16,10 +17,11 @@ import {
 import { NavLink } from 'react-router';
 
 interface PropsMenuItem {
-    item: CvList;
+    item: CvItem;
     handleDuplicar: (id: number) => void;
     handlePdf: (id: number) => void;
     handleDelete: (id: number) => void;
+    handleView: (id: number) => void;
 }
 
 function MenuItem({
@@ -27,6 +29,7 @@ function MenuItem({
     handleDuplicar,
     handlePdf,
     handleDelete,
+    handleView,
 }: PropsMenuItem) {
     return (
         <DropdownMenu>
@@ -36,6 +39,10 @@ function MenuItem({
                 </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent>
+                <DropdownMenuItem onClick={() => handleView(item.id)}>
+                    <Eye />
+                    Ver
+                </DropdownMenuItem>
                 <DropdownMenuItem onClick={() => handleDuplicar(item.id)}>
                     <FileStack />
                     Duplicar

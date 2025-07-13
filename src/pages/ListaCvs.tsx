@@ -9,6 +9,14 @@ import { NavLink } from 'react-router';
 import Paginate from '@/components/Paginate';
 import TablesCvs from '@/components/listCvs/TableCvs';
 import MenuItem from '@/components/listCvs/MenuItem';
+import {
+    Dialog,
+    DialogContent,
+    DialogDescription,
+    DialogTitle,
+    DialogFooter,
+    DialogHeader,
+} from '@/components/ui/dialog';
 
 export default function ListaCvs() {
     const [dataPage, setDataPage] = useState<{
@@ -26,6 +34,11 @@ export default function ListaCvs() {
         total_pages: 1,
         data: [],
     });
+
+    const [loadingModal, setLoadingModal] = useState<boolean>(false);
+    const [modalOpen, setModalOpen] = useState<boolean>(false);
+    const [errorModal, setErrorModal] = useState<string | null>(null);
+    const [modalData, setModalData] = useState<object | null>(null);
 
     const getCvs = async (page = 1) => {
         try {
@@ -70,6 +83,20 @@ export default function ListaCvs() {
         }
     };
 
+    const handleView = async (id: number) => {
+        setLoadingModal(true);
+        setErrorModal(null);
+        setModalOpen(true);
+        try {
+            const data = await cvService.show(id);
+            setModalData(data);
+        } catch (error) {
+            setErrorModal('Error al cargar el CV');
+        } finally {
+            setLoadingModal(false);
+        }
+    };
+
     useEffect(() => {
         getCvs();
     }, []);
@@ -97,6 +124,7 @@ export default function ListaCvs() {
                         handleDuplicar={handleDuplicar}
                         handlePdf={handlePdf}
                         handleDelete={handleDelete}
+                        handleView={handleView}
                     />
                 )}
             />
@@ -107,6 +135,47 @@ export default function ListaCvs() {
                 onPageChange={getCvs}
                 limit={5}
             />
+
+            <Dialog open={modalOpen} onOpenChange={setModalOpen}>
+                <DialogContent>
+                    <DialogHeader>
+                        <DialogTitle>Detalle del CV</DialogTitle>
+                        <DialogDescription>
+                            {loadingModal && 'Cargando...'}
+                            {errorModal && (
+                                <span className="text-red-500">
+                                    {errorModal}
+                                </span>
+                            )}
+                        </DialogDescription>
+                    </DialogHeader>
+                    {modalData && (
+                        <pre className="bg-gray-100 dark:bg-gray-800 p-2 rounded text-xs max-h-64 overflow-auto">
+                            {JSON.stringify(modalData, null, 2)}
+                        </pre>
+                    )}
+                    <DialogFooter>
+                        <Button
+                            onClick={() => {
+                                if (modalData) {
+                                    navigator.clipboard.writeText(
+                                        JSON.stringify(modalData, null, 2)
+                                    );
+                                }
+                            }}
+                            disabled={!modalData}
+                        >
+                            Copiar
+                        </Button>
+                        <Button
+                            variant="secondary"
+                            onClick={() => setModalOpen(false)}
+                        >
+                            Cerrar
+                        </Button>
+                    </DialogFooter>
+                </DialogContent>
+            </Dialog>
         </Page>
     );
 }
