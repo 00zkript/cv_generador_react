@@ -13,9 +13,8 @@ type DialogVariant = 'destructive' | 'warning' | 'success' | 'info';
 
 interface DialogConfirmProps {
     open: boolean;
-    setOpen: (open: boolean) => void;
-    confirm: () => void;
-    cancel: () => void;
+    onConfirm: () => void;
+    onCancel: () => void;
     title?: string;
     message?: string;
     variant?: DialogVariant;
@@ -25,9 +24,8 @@ interface DialogConfirmProps {
 
 function DialogConfirm({
     open,
-    setOpen,
-    confirm,
-    cancel,
+    onConfirm,
+    onCancel,
     title = '¿Está seguro?',
     message = 'Esta acción no se puede deshacer.',
     variant = 'warning',
@@ -41,11 +39,11 @@ function DialogConfirm({
                 containerClass: 'border-destructive/50',
             },
             warning: {
-                buttonVariant: 'warning' as const,
+                buttonVariant: 'ghost' as const,
                 containerClass: 'border-warning/50',
             },
             success: {
-                buttonVariant: 'success' as const,
+                buttonVariant: 'default' as const,
                 containerClass: 'border-success/50',
             },
             info: {
@@ -59,7 +57,7 @@ function DialogConfirm({
     const variantStyles = getVariantStyles();
 
     return (
-        <Dialog open={open} onOpenChange={setOpen}>
+        <Dialog open={open}>
             <DialogContent
                 className={cn('sm:max-w-[425px]', variantStyles.containerClass)}
             >
@@ -78,11 +76,11 @@ function DialogConfirm({
                                 | 'outline'
                                 | 'ghost'
                         }
-                        onClick={confirm}
+                        onClick={onConfirm}
                     >
                         {confirmText}
                     </Button>
-                    <Button variant="outline" onClick={cancel}>
+                    <Button variant="outline" onClick={onCancel}>
                         {cancelText}
                     </Button>
                 </DialogFooter>
