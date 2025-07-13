@@ -41,7 +41,16 @@ export default function ListaCvs() {
     const [modalOpen, setModalOpen] = useState<boolean>(false);
     const [errorModal, setErrorModal] = useState<string | null>(null);
     const [modalData, setModalData] = useState<object | null>(null);
-    const [openConfirm, setOpenConfirm] = useState<boolean>(false);
+
+    const [modalCofirmDuplicate, setModalCofirmDuplicate] = useState<{
+        open: boolean;
+        id: number | null;
+    }>({ open: false, id: null });
+
+    const [modalCofirmDelete, setModalCofirmDelete] = useState<{
+        open: boolean;
+        id: number | null;
+    }>({ open: false, id: null });
 
     const getCvs = async (page = 1) => {
         try {
@@ -52,11 +61,16 @@ export default function ListaCvs() {
         }
     };
 
-    const handleDuplicar = async (id: number) => {
+    const handleDuplicar = async () => {
         console.log('Duplicando Cv...');
+        if (!modalCofirmDuplicate.id) {
+            return null;
+        }
+
         try {
-            await cvService.duplicate(id);
+            await cvService.duplicate(modalCofirmDuplicate.id);
             getCvs();
+            setModalCofirmDuplicate({ open: false, id: null });
         } catch (error) {
             console.error(error);
         }
@@ -72,15 +86,21 @@ export default function ListaCvs() {
         a.click();
     };
 
-    const handleDelete = async (id: number) => {
+    const handleDelete = async () => {
         // console.log('Eliminando Cv...');
+
+        if (!modalCofirmDelete.id) {
+            return null;
+        }
+
         try {
-            await cvService.destroy(id);
+            await cvService.destroy(modalCofirmDelete.id);
             // setDataPage((prev) => ({
             //     ...dataPage,
             //     data: prev.data.filter((item) => item.id !== id),
             // }));
             getCvs();
+            setModalCofirmDelete({ open: false, id: null });
         } catch (error) {
             console.error(error);
         }
@@ -124,9 +144,19 @@ export default function ListaCvs() {
                 renderMenu={(item) => (
                     <MenuItem
                         item={item}
-                        handleDuplicar={handleDuplicar}
+                        handleDuplicar={() =>
+                            setModalCofirmDuplicate({
+                                open: true,
+                                id: item.id,
+                            })
+                        }
                         handlePdf={handlePdf}
-                        handleDelete={handleDelete}
+                        handleDelete={() =>
+                            setModalCofirmDelete({
+                                open: true,
+                                id: item.id,
+                            })
+                        }
                         handleView={handleView}
                     />
                 )}
@@ -147,15 +177,22 @@ export default function ListaCvs() {
                 modalData={modalData}
             />
 
-            <Button variant={'default'} onClick={() => setOpenConfirm(true)}>
-                Confirm
-            </Button>
+            <DialogConfirm
+                open={modalCofirmDuplicate.open}
+                onConfirm={handleDuplicar}
+                onCancel={() =>
+                    setModalCofirmDuplicate({ open: false, id: null })
+                }
+                title="¿Está seguro de duplicar el registro?"
+                variant="success"
+            />
 
             <DialogConfirm
-                open={openConfirm}
-                setOpen={setOpenConfirm}
-                confirm={() => setOpenConfirm(false)}
-                cancel={() => setOpenConfirm(false)}
+                open={modalCofirmDelete.open}
+                onConfirm={handleDelete}
+                onCancel={() => setModalCofirmDelete({ open: false, id: null })}
+                title="¿Está seguro de eliminar este registro?"
+                variant="destructive"
             />
         </Page>
     );
