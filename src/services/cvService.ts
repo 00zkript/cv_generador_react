@@ -1,78 +1,56 @@
-import axios from "@/plugins/axios";
+import axios from '@/plugins/axios';
 
 const URL_API = import.meta.env.VITE_API_URL_BASE;
-const URL = URL_API+'/cvs';
+const URL = URL_API + '/cvs';
 
 async function index() {
-    try {
-        const response = await axios.get(`${URL}`);
-        return response.data;       
-    } catch (error) {
-        console.error('Error de servidor',error);
-        throw error;
-    }
+    const response = await axios.get(`${URL}`);
+    return response.data;
 }
 
-async function show(id:number) {
-    try {
-        const response = await axios.get(`${URL}/${id}`);
-        return response.data;       
-    } catch (error) {
-        console.error('Error de servidor',error);
-        throw error;
-    }
+async function paginate(page = 1, perPage = 10) {
+    const response = await axios.get(`${URL}/paginate`, {
+        params: { page, per_page: perPage },
+    });
+    return response.data;
 }
 
-async function store<T,>(data: T) {
-    try {
-        const response = await axios.post(`${URL}/`, data );
-        return response.data;       
-    } catch (error) {
-        console.error('Error de servidor',error);
-        throw error;
-    }
+async function show(id: number) {
+    const response = await axios.get(`${URL}/${id}`);
+    return response.data;
 }
 
-async function update<T,>(id : number, data: T) {
-    try {
-        const response = await axios.put(`${URL}/${id}`, data );
-        return response.data;       
-    } catch (error) {
-        console.error('Error de servidor',error);
-        throw error;
-    }
+async function store<T>(data: T) {
+    const response = await axios.post(`${URL}/`, data);
+    return response.data;
 }
 
-async function destroy(id : number) {
-    try {
-        const response = await axios.delete(`${URL}/${id}`);
-        return response.data;       
-    } catch (error) {
-        console.error('Error de servidor',error);
-        throw error;
-    }
+async function update<T>(id: number, data: T) {
+    const response = await axios.put(`${URL}/${id}`, data);
+    return response.data;
 }
 
-async function duplicate(id : number) {
-    try {
-        const response = await axios.post(`${URL}/${id}/duplicate`);
-        return response.data;       
-    } catch (error) {
-        console.error('Error de servidor',error);
-        throw error;
-    }
+async function destroy(id: number) {
+    const response = await axios.delete(`${URL}/${id}`);
+    return response.data;
 }
 
-function pdf(id : number) {
-    return `${URL}/${id}/pdf`
+async function duplicate(id: number) {
+    const response = await axios.post(`${URL}/${id}/duplicate`);
+    return response.data;
 }
 
-export default { 
-    index, 
-    show, 
-    store, 
-    update, 
-    destroy, 
+function pdf(id: number) {
+    return `${URL}/${id}/pdf`;
+}
+
+export default {
+    index,
+    paginate,
+    show,
+    store,
+    update,
+    destroy,
     duplicate,
     pdf,
 };

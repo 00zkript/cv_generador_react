@@ -1,106 +1,54 @@
 import Page from '@/components/Page';
 import { Button } from '@/components/ui/button';
 import cvService from '@/services/cvService';
-import { CvList, CvListSchema } from '@/types/Cv';
-import {
-    CirclePlus,
-    Ellipsis,
-    FilePenLine,
-    FileStack,
-    FileText,
-    Trash2,
-} from 'lucide-react';
+import { CvList } from '@/types/Cv';
+import { CirclePlus } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { NavLink } from 'react-router';
 import { format } from '@formkit/tempo';
-import {
-    DropdownMenu,
-    DropdownMenuContent,
-    DropdownMenuItem,
-    DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
+
 import Paginate from '@/components/Paginate';
-
-// import { z } from "zod";
-
-interface PropsMenuItem {
-    item: CvList;
-    handleDuplicar: (id: number) => void;
-    handlePdf: (id: number) => void;
-    handleDelete: (id: number) => void;
-}
-
-function MenuItem({
-    item,
-    handleDuplicar,
-    handlePdf,
-    handleDelete,
-}: PropsMenuItem) {
-    return (
-        <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-                <Button variant="ghost" size="icon">
-                    <Ellipsis />
-                </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent>
-                <DropdownMenuItem onClick={() => handleDuplicar(item.id)}>
-                    <FileStack />
-                    Duplicar
-                </DropdownMenuItem>
-                <DropdownMenuItem asChild>
-                    <NavLink to={'cv/editar/' + item.id}>
-                        <FilePenLine />
-                        Editar
-                    </NavLink>
-                </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => handlePdf(item.id)}>
-                    <FileText />
-                    PDF
-                </DropdownMenuItem>
-                <DropdownMenuItem
-                    onClick={() => handleDelete(item.id)}
-                    variant="destructive"
-                >
-                    <Trash2 />
-                    Eliminar
-                </DropdownMenuItem>
-            </DropdownMenuContent>
-        </DropdownMenu>
-    );
-}
+import MenuItem from '@/components/listCvs/MenuItem';
+import TablesCvs from '@/components/listCvs/TableCvs';
 
 export default function ListaCvs() {
-    const [data, setData] = useState<CvList[]>([]);
-    const [page, setPage] = useState(1);
+    const [dataPage, setDataPage] = useState<{
+        total: number;
+        per_page: number;
+        current_page: number;
+        last_page: number;
+        total_pages: number;
+        data: CvList[];
+    }>({
+        total: 0,
+        per_page: 5,
+        current_page: 1,
+        last_page: 1,
+        total_pages: 1,
+        data: [],
+    });
 
-    const getCvs = async () => {
+    const getCvs = async (page = 1) => {
         try {
-            const cvsList = await cvService.index();
-            // const parsedCvsList = z.array(CvListSchema).parse(cvsList);
-            setData(cvsList);
+            const data = await cvService.paginate(page, dataPage.per_page);
+            setDataPage(data);
         } catch (error) {
             console.error(error);
         }
     };
 
-    useEffect(() => {
-        getCvs();
-    }, []);
-
     const handleDuplicar = async (id: number) => {
         console.log('Duplicando Cv...');
         try {
-            const result = await cvService.duplicate(id);
-            const parsedResult = CvListSchema.parse(result);
-            setData((prev) => [...prev, parsedResult]);
+            await cvService.duplicate(id);
+            getCvs();
         } catch (error) {
             console.error(error);
         }
     };
 
     const handlePdf = async (id: number) => {
-        console.log('Imprimiendo Cv...');
+        // console.log('Imprimiendo Cv...');
         // console.log(id);
         // http://localhost:8000/cvs/1/pdf
         const a = document.createElement('a');
@@ -110,14 +58,22 @@ export default function ListaCvs() {
     };
 
     const handleDelete = async (id: number) => {
-        console.log('Eliminando Cv...');
+        // console.log('Eliminando Cv...');
         try {
             await cvService.destroy(id);
-            setData((prev) => prev.filter((item) => item.id !== id));
+            // setDataPage((prev) => ({
+            //     ...dataPage,
+            //     data: prev.data.filter((item) => item.id !== id),
+            // }));
+            getCvs();
         } catch (error) {
             console.error(error);
         }
     };
+
+    useEffect(() => {
+        getCvs();
+    }, []);
 
     return (
         <Page>
@@ -134,59 +90,17 @@ export default function ListaCvs() {
                 </Button>
             </div>
 
-            <table className="table-auto w-full table-c1">
-                <thead>
-                    <tr className="text-center">
-                        <th>Acción</th>
-                        <th>Idioma</th>
-                        <th>Nombre</th>
-                        <th>Propósito</th>
-                        <th>Version</th>
-                        <th>Fecha creación</th>
-                        <th>Ultima modificación</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {data.map((item, index) => (
-                        <tr key={index}>
-                            <td className="text-center">
-                                <MenuItem
-                                    item={item}
-                                    handleDuplicar={handleDuplicar}
-                                    handlePdf={handlePdf}
-                                    handleDelete={handleDelete}
-                                />
-                            </td>
-                            <td>{item.language}</td>
-                            <td>{item.name}</td>
-                            <td>{item.subject}</td>
-                            <td className="text-center">{item.version}</td>
-                            <td className="text-center">
-                                {format(
-                                    item.created_at ?? '',
-                                    'medium',
-                                    'es-Pe'
-                                )}
-                            </td>
-                            <td className="text-center">
-                                {format(
-                                    item.updated_at ?? '',
-                                    'medium',
-                                    'es-Pe'
-                                )}
-                            </td>
-                        </tr>
-                    ))}
-                </tbody>
-            </table>
+            <TablesCvs
+                data={dataPage.data}
+                handleDuplicar={handleDuplicar}
+                handlePdf={handlePdf}
+                handleDelete={handleDelete}
+            />
 
             <Paginate
-                page={page}
-                totalPages={10}
-                onPageChange={(page) => {
-                    console.log('Page changed to:', page);
-                    setPage(page);
-                }}
+                currentPage={dataPage?.current_page}
+                totalPages={dataPage?.total_pages}
+                onPageChange={getCvs}
                 limit={5}
             />
         </Page>

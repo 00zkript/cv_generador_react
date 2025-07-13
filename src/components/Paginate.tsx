@@ -12,16 +12,21 @@ interface PaginateType {
     onPageChange: (number: number) => void;
     totalPages: number;
     limit: number;
-    page: number;
+    currentPage: number;
 }
 
-function Paginate({ onPageChange, totalPages, limit, page }: PaginateType) {
+function Paginate({
+    onPageChange,
+    totalPages,
+    limit,
+    currentPage,
+}: PaginateType) {
     const renderPageNumbers = () => {
         const items = [];
         const halfLimit = Math.floor(limit / 2);
 
         // Calculate start and end pages
-        let startPage = Math.max(1, page - halfLimit);
+        let startPage = Math.max(1, currentPage - halfLimit);
         const endPage = Math.min(totalPages, startPage + limit - 1);
 
         // Adjust start page if we're near the end
@@ -44,7 +49,7 @@ function Paginate({ onPageChange, totalPages, limit, page }: PaginateType) {
                 <PaginationItem key={i}>
                     <PaginationLink
                         href="#"
-                        isActive={page === i}
+                        isActive={currentPage === i}
                         onClick={(e) => {
                             e.preventDefault();
                             onPageChange(i);
@@ -71,25 +76,25 @@ function Paginate({ onPageChange, totalPages, limit, page }: PaginateType) {
     return (
         <Pagination>
             <PaginationContent>
-                {page > 1 && (
+                {currentPage > 1 && (
                     <PaginationItem>
                         <PaginationPrevious
                             href="#"
                             onClick={(e) => {
                                 e.preventDefault();
-                                onPageChange(page - 1);
+                                onPageChange(currentPage - 1);
                             }}
                         />
                     </PaginationItem>
                 )}
                 {renderPageNumbers()}
-                {page < totalPages && (
+                {currentPage < totalPages && (
                     <PaginationItem>
                         <PaginationNext
                             href="#"
                             onClick={(e) => {
                                 e.preventDefault();
-                                onPageChange(page + 1);
+                                onPageChange(currentPage + 1);
                             }}
                         />
                     </PaginationItem>
