@@ -12,6 +12,7 @@ function TablesCvs({ data, renderMenu }: TablesCvsType) {
             <thead>
                 <tr className="text-center">
                     <th>Acción</th>
+                    <th>#ID</th>
                     <th>Idioma</th>
                     <th>Nombre</th>
                     <th>Propósito</th>
@@ -24,6 +25,9 @@ function TablesCvs({ data, renderMenu }: TablesCvsType) {
                 {data?.map((item, index) => (
                     <tr key={index}>
                         <td className="text-center">{renderMenu(item)}</td>
+                        <td className="text-center">
+                            {String(item.id).padStart(4, '0')}
+                        </td>
                         <td>{item.language}</td>
                         <td>{item.name}</td>
                         <td>{item.subject}</td>
