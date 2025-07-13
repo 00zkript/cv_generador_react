@@ -1,20 +1,12 @@
-import { CvList } from '@/types/Cv';
-import MenuItem from './MenuItem';
+import { CvItem } from '@/types/Cv';
 import { format } from '@formkit/tempo';
 
 export interface TablesCvsType {
-    data: CvList[];
-    handleDuplicar: (itemId: number) => void;
-    handlePdf: (itemId: number) => void;
-    handleDelete: (itemId: number) => void;
+    data: CvItem[];
+    renderMenu: (item: CvItem) => React.ReactNode;
 }
 
-function TablesCvs({
-    data,
-    handleDuplicar,
-    handlePdf,
-    handleDelete,
-}: TablesCvsType) {
+function TablesCvs({ data, renderMenu }: TablesCvsType) {
     return (
         <table className="table-auto w-full table-c1">
             <thead>
@@ -31,14 +23,7 @@ function TablesCvs({
             <tbody>
                 {data?.map((item, index) => (
                     <tr key={index}>
-                        <td className="text-center">
-                            <MenuItem
-                                item={item}
-                                handleDuplicar={handleDuplicar}
-                                handlePdf={handlePdf}
-                                handleDelete={handleDelete}
-                            />
-                        </td>
+                        <td className="text-center">{renderMenu(item)}</td>
                         <td>{item.language}</td>
                         <td>{item.name}</td>
                         <td>{item.subject}</td>

@@ -1,15 +1,14 @@
 import Page from '@/components/Page';
 import { Button } from '@/components/ui/button';
 import cvService from '@/services/cvService';
-import { CvList } from '@/types/Cv';
+import { CvItem } from '@/types/Cv';
 import { CirclePlus } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { NavLink } from 'react-router';
-import { format } from '@formkit/tempo';
 
 import Paginate from '@/components/Paginate';
-import MenuItem from '@/components/listCvs/MenuItem';
 import TablesCvs from '@/components/listCvs/TableCvs';
+import MenuItem from '@/components/listCvs/MenuItem';
 
 export default function ListaCvs() {
     const [dataPage, setDataPage] = useState<{
@@ -18,7 +17,7 @@ export default function ListaCvs() {
         current_page: number;
         last_page: number;
         total_pages: number;
-        data: CvList[];
+        data: CvItem[];
     }>({
         total: 0,
         per_page: 5,
@@ -92,9 +91,14 @@ export default function ListaCvs() {
 
             <TablesCvs
                 data={dataPage.data}
-                handleDuplicar={handleDuplicar}
-                handlePdf={handlePdf}
-                handleDelete={handleDelete}
+                renderMenu={(item) => (
+                    <MenuItem
+                        item={item}
+                        handleDuplicar={handleDuplicar}
+                        handlePdf={handlePdf}
+                        handleDelete={handleDelete}
+                    />
+                )}
             />
 
             <Paginate

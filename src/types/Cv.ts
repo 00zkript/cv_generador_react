@@ -1,7 +1,6 @@
-import { z } from "zod";
-import { ContactBaseSchema } from "./Contact";
-import BaseSchema from "./Base";
-
+import { z } from 'zod';
+import { ContactBaseSchema } from './Contact';
+import BaseSchema from './Base';
 
 export const CvBaseSchema = BaseSchema.extend({
     id: z.number().int().nullable(),
@@ -12,7 +11,7 @@ export const CvBaseSchema = BaseSchema.extend({
     language: z.string().default('esp'),
 });
 
-export const CvListSchema = CvBaseSchema.required({
+export const CvItemSchema = CvBaseSchema.required({
     created_at: true,
     updated_at: true,
 }).extend({
@@ -20,9 +19,8 @@ export const CvListSchema = CvBaseSchema.required({
     contact: ContactBaseSchema.partial().optional(),
 });
 
-
 export type CvBase = z.infer<typeof CvBaseSchema>;
-export type CvList = z.infer<typeof CvListSchema>;
+export type CvItem = z.infer<typeof CvItemSchema>;
 
 // export interface Cv {
 //     id: number;
@@ -32,5 +30,3 @@ export type CvList = z.infer<typeof CvListSchema>;
 //     version: string;
 //     updated_at: string
 // }
-
-
