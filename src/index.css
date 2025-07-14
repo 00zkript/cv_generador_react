@@ -1,8 +1,23 @@
 @import "tailwindcss";
-
 @plugin "tailwindcss-animate";
-
 @custom-variant dark (&:is(.dark *));
+
+@theme {
+  --breakpoint-sm: 40rem;
+  --breakpoint-lg: 64rem;
+  --color-primary: #5865f2;
+  --font-sans: "Satoshi", sans-serif;
+}
+
+/* Tu configuración de PrimeReact como habíamos visto */
+@layer theme, base, primereact, utilities;
+
+@import "primereact/resources/themes/mira/theme.css";
+@import "tailwindcss/preflight" layer(base);
+@import "tailwindcss/utilities" layer(utilities);
+
+
+
 
 body{
     /* @apply bg-gray-100; */
