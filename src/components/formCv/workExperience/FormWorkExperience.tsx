@@ -1,12 +1,8 @@
 import Input from '@/components/Input';
-// import Textarea from "@/components/Textarea";
 import { WorkExperienceBase } from '@/types/WorkExperience';
 import AchievementsList from './AchievementsList';
 import { AchievementBase } from '@/types/Achievement';
-import { Button } from '@/components/ui/button';
-import { formatearBold, formatearList } from '@/lib/formatText';
-import { Editor, EditorTextChangeEvent } from 'primereact/editor';
-// import LogrosList from "./LogrosList";
+import { SimpleEditor } from '@/components/tiptap-templates/simple/simple-editor';
 
 interface FormWorkExperienceProps {
     workExperience: WorkExperienceBase;
@@ -22,13 +18,6 @@ export default function FormWorkExperience({
     ) => {
         const { name, value } = e.target;
         updateWorkExperience({ ...workExperience, [name]: value });
-    };
-
-    const handleDescription = (e: EditorTextChangeEvent) => {
-        updateWorkExperience({
-            ...workExperience,
-            description: e.htmlValue || '',
-        });
     };
 
     const handleInputCheckbox = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -76,12 +65,6 @@ export default function FormWorkExperience({
             ...workExperience,
             achievements: newAchievements,
         });
-    };
-
-    const formatearDescription = () => {
-        const newText = formatearList(workExperience.description);
-        const newText2 = formatearBold(newText);
-        updateWorkExperience({ ...workExperience, description: newText2 });
     };
 
     return (
@@ -143,18 +126,19 @@ export default function FormWorkExperience({
 
             <div className="col-span-3 relative">
                 <label className="form-label">Descripción</label>
-                <Editor
-                    placeholder="Descripción"
-                    name="description"
-                    value={workExperience.description}
-                    onTextChange={handleDescription}
-                    style={{ height: '320px' }}
-                    formats={['code-block']}
-                    modules={{
-                        syntax: true,
-                    }}
-                />
+                <div className="editor-wrapper prose max-w-none dark:prose-invert">
+                    <SimpleEditor
+                        content={workExperience.description}
+                        setContent={(value) =>
+                            updateWorkExperience({
+                                ...workExperience,
+                                description: value,
+                            })
+                        }
+                    />
+                </div>
             </div>
+
             <div className="col-span-3">
                 <AchievementsList
                     achievements={workExperience.achievements}
