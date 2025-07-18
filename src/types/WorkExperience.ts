@@ -1,7 +1,6 @@
-import { z } from "zod";
-import BaseSchema from "./Base";
-import { AchievementBaseSchema } from "./Achievement";
-
+import { z } from 'zod';
+import BaseSchema from './Base';
+import { AchievementBaseSchema } from './Achievement';
 
 export const WorkExperienceBaseSchema = BaseSchema.extend({
     id: z.number().int().nullable(),
@@ -15,15 +14,13 @@ export const WorkExperienceBaseSchema = BaseSchema.extend({
     city: z.string(),
     country: z.string(),
     description: z.string(),
-    achievements: AchievementBaseSchema.array(),
+    achievements: z.string(),
+    // achievements: AchievementBaseSchema.array(),
 });
-
 
 export const WorkExperienceCreateSchema = BaseSchema.extend({});
 export const WorkExperienceUpdateSchema = BaseSchema.extend({});
 
-
 export type WorkExperienceBase = z.infer<typeof WorkExperienceBaseSchema>;
 export type WorkExperienceCreate = z.infer<typeof WorkExperienceCreateSchema>;
 export type WorkExperienceUpdate = z.infer<typeof WorkExperienceUpdateSchema>;
-

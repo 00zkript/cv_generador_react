@@ -1,7 +1,5 @@
 import Input from '@/components/Input';
 import { WorkExperienceBase } from '@/types/WorkExperience';
-import AchievementsList from './AchievementsList';
-import { AchievementBase } from '@/types/Achievement';
 import { SimpleEditor } from '@/components/tiptap-templates/simple/simple-editor';
 
 interface FormWorkExperienceProps {
@@ -23,48 +21,6 @@ export default function FormWorkExperience({
     const handleInputCheckbox = (e: React.ChangeEvent<HTMLInputElement>) => {
         const { name, checked } = e.target;
         updateWorkExperience({ ...workExperience, [name]: checked });
-    };
-
-    const addAchievement = () => {
-        const newAchievement: AchievementBase = {
-            id: null,
-            work_experience_id: workExperience.id,
-            description: '',
-        };
-        const newAchievements = [
-            ...workExperience.achievements,
-            newAchievement,
-        ];
-        updateWorkExperience({
-            ...workExperience,
-            achievements: newAchievements,
-        });
-    };
-
-    const updateAchievementDescription = (
-        index: number,
-        achievementItem: AchievementBase,
-        newAchievementDescription: AchievementBase['description']
-    ) => {
-        const newAchievements = workExperience.achievements.map((prev, i) =>
-            i === index
-                ? { ...achievementItem, description: newAchievementDescription }
-                : prev
-        );
-        updateWorkExperience({
-            ...workExperience,
-            achievements: newAchievements,
-        });
-    };
-
-    const removeAchievement = (index: number) => {
-        const newAchievements = workExperience.achievements.filter(
-            (_, i) => i !== index
-        );
-        updateWorkExperience({
-            ...workExperience,
-            achievements: newAchievements,
-        });
     };
 
     return (
@@ -138,15 +94,29 @@ export default function FormWorkExperience({
                     />
                 </div>
             </div>
+            <div className="col-span-3 relative">
+                <label className="form-label">Logros</label>
+                <div className="editor-wrapper prose max-w-none dark:prose-invert">
+                    <SimpleEditor
+                        content={workExperience.achievements}
+                        setContent={(value) =>
+                            updateWorkExperience({
+                                ...workExperience,
+                                achievements: value,
+                            })
+                        }
+                    />
+                </div>
+            </div>
 
-            <div className="col-span-3">
+            {/* <div className="col-span-3">
                 <AchievementsList
                     achievements={workExperience.achievements}
                     addAchievement={addAchievement}
                     updateAchievementDescription={updateAchievementDescription}
                     removeAchievement={removeAchievement}
                 />
-            </div>
+            </div> */}
         </div>
     );
 }
