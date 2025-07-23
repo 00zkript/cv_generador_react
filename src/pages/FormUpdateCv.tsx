@@ -1,72 +1,77 @@
-import Page from "@/components/Page";
-import { Button } from "@/components/ui/button";
-import { CornerUpLeft, Save, X } from 'lucide-react';
-import { NavLink } from "react-router";
-import FormCv from "@/components/formCv/FormCv";
-import { AlertError } from "@/components/AlertError";
-import useFormUpdate from "@/hooks/useFormUpdate";
-
+import Page from '@/components/Page';
+import { Button } from '@/components/ui/button';
+import { CornerUpLeft, FileText, Save, X } from 'lucide-react';
+import { NavLink } from 'react-router';
+import FormCv from '@/components/formCv/FormCv';
+import { AlertError } from '@/components/AlertError';
+import useFormUpdate from '@/hooks/useFormUpdate';
 
 export default function FormUpdate() {
-
     const {
+        id,
         useFormInstance,
         errorsValidations,
         handleClearForm,
         handleSaveForm,
+        handlePdf,
     } = useFormUpdate();
-
 
     return (
         <Page>
-            { errorsValidations.length > 0 &&
+            {errorsValidations.length > 0 && (
                 <AlertError title="Formulario de contacto" className="my-4">
                     <ul>
-                        { errorsValidations.map((ele,idx) => (
-                            <li key={idx} >{ele}</li>
-                        )) }
+                        {errorsValidations.map((ele, idx) => (
+                            <li key={idx}>{ele}</li>
+                        ))}
                     </ul>
                 </AlertError>
-               
-            }
+            )}
 
-
-            <FormCv 
+            <FormCv
                 header={
-                    <div className='flex gap-4 justify-between '>
+                    <div className="flex gap-4 justify-between ">
                         <Button variant={'link'} asChild>
-                            <NavLink to='/'>
+                            <NavLink to="/">
                                 <CornerUpLeft /> Regresar
                             </NavLink>
                         </Button>
-                        <div className='flex gap-4'>
-                            <Button variant={'secondary'} onClick={handleClearForm}>
-                                <X/>  Resetear
+                        <div className="flex gap-4">
+                            <Button
+                                variant={'destructive'}
+                                onClick={() => handlePdf(Number(id))}
+                            >
+                                <FileText />
+                                Ver PDF
                             </Button>
 
-                            <Button type="submit" >
+                            <Button
+                                variant={'secondary'}
+                                onClick={handleClearForm}
+                            >
+                                <X /> Resetear
+                            </Button>
+
+                            <Button type="submit">
                                 <Save /> Actualizar
                             </Button>
                         </div>
                     </div>
                 }
-                onSubmit={handleSaveForm} {...useFormInstance }
+                onSubmit={handleSaveForm}
+                {...useFormInstance}
                 footer={
-                    <div className='flex gap-4 justify-center pt-4 border-t border-gray-200 dark:border-gray-700'>
+                    <div className="flex gap-4 justify-center pt-4 border-t border-gray-200 dark:border-gray-700">
                         <Button variant={'secondary'} onClick={handleClearForm}>
-                            <X/> Resetear
+                            <X /> Resetear
                         </Button>
 
-                        <Button type="submit" >
+                        <Button type="submit">
                             <Save /> Actualizar
                         </Button>
                     </div>
                 }
             />
-
         </Page>
     );
 }
-
-
-

@@ -33,7 +33,7 @@ function SectionWorkExperience({
             current: false,
             city: '',
             country: '',
-            achievements: [],
+            achievements: '',
             status: true,
         };
         setWorkExperience((prev) => [...prev, newWorkExperience]);

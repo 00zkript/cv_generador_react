@@ -9,14 +9,6 @@ import { NavLink } from 'react-router';
 import Paginate from '@/components/Paginate';
 import TablesCvs from '@/components/listCvs/TableCvs';
 import MenuItem from '@/components/listCvs/MenuItem';
-import {
-    Dialog,
-    DialogContent,
-    DialogDescription,
-    DialogTitle,
-    DialogFooter,
-    DialogHeader,
-} from '@/components/ui/dialog';
 import ModalVer from '@/components/listCvs/ModalVer';
 import DialogConfirm from '@/components/DialogConfirm';
 
