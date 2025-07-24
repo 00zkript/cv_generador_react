@@ -26,6 +26,14 @@ import {
     ToolbarGroup,
     ToolbarSeparator,
 } from '@/components/tiptap-ui-primitive/toolbar';
+import {
+    Dialog,
+    DialogContent,
+    DialogHeader,
+    DialogTitle,
+    DialogFooter,
+    DialogTrigger,
+} from '@/components/ui/dialog';
 
 // --- Tiptap Node ---
 import { ImageUploadNode } from '@/components/tiptap-node/image-upload-node/image-upload-node-extension';
@@ -74,6 +82,136 @@ import { handleImageUpload, MAX_FILE_SIZE } from '@/lib/tiptap-utils';
 import '@/components/tiptap-templates/simple/simple-editor.scss';
 
 // import content from '@/components/tiptap-templates/simple/data/content.json';
+
+const HtmlPopover = () => {
+    const { editor } = React.useContext(EditorContext);
+    const [isOpen, setIsOpen] = React.useState(false);
+    const [htmlContent, setHtmlContent] = React.useState('');
+
+    const insertHtml = () => {
+        if (editor && htmlContent.trim()) {
+            editor.commands.insertContent(htmlContent);
+            setHtmlContent('');
+            setIsOpen(false);
+        }
+    };
+
+    const handleClear = () => {
+        setHtmlContent('');
+    };
+
+    return (
+        <Dialog open={isOpen} onOpenChange={setIsOpen}>
+            <DialogTrigger asChild>
+                <Button data-style="ghost" type="button" title="Insertar HTML">
+                    &lt;/&gt;
+                </Button>
+            </DialogTrigger>
+            <DialogContent className="sm:max-w-md">
+                <DialogHeader>
+                    <DialogTitle>Insertar código HTML</DialogTitle>
+                </DialogHeader>
+                <div className="flex flex-col gap-4">
+                    <div>
+                        <label className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 block">
+                            Código HTML:
+                        </label>
+                        <textarea
+                            value={htmlContent}
+                            onChange={(e) => setHtmlContent(e.target.value)}
+                            placeholder="Pega tu código HTML aquí..."
+                            className="w-full h-32 p-3 border border-gray-300 dark:border-gray-600 rounded-md resize-none text-sm font-mono bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-gray-100"
+                            autoFocus
+                        />
+                    </div>
+                </div>
+                <DialogFooter className="gap-2">
+                    <Button
+                        type="button"
+                        onClick={handleClear}
+                        data-style="ghost"
+                        className="px-3 py-2"
+                    >
+                        Limpiar
+                    </Button>
+                    <Button
+                        type="button"
+                        onClick={insertHtml}
+                        disabled={!htmlContent.trim()}
+                        className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
+                    >
+                        Insertar HTML
+                    </Button>
+                </DialogFooter>
+            </DialogContent>
+        </Dialog>
+    );
+};
+
+const HtmlDialogMobile = () => {
+    const { editor } = React.useContext(EditorContext);
+    const [isOpen, setIsOpen] = React.useState(false);
+    const [htmlContent, setHtmlContent] = React.useState('');
+
+    const insertHtml = () => {
+        if (editor && htmlContent.trim()) {
+            editor.commands.insertContent(htmlContent);
+            setHtmlContent('');
+            setIsOpen(false);
+        }
+    };
+
+    const handleClear = () => {
+        setHtmlContent('');
+    };
+
+    return (
+        <Dialog open={isOpen} onOpenChange={setIsOpen}>
+            <DialogTrigger asChild>
+                <Button data-style="ghost" title="Insertar HTML">
+                    HTML
+                </Button>
+            </DialogTrigger>
+            <DialogContent className="sm:max-w-md">
+                <DialogHeader>
+                    <DialogTitle>Insertar código HTML</DialogTitle>
+                </DialogHeader>
+                <div className="flex flex-col gap-4">
+                    <div>
+                        <label className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 block">
+                            Código HTML:
+                        </label>
+                        <textarea
+                            value={htmlContent}
+                            onChange={(e) => setHtmlContent(e.target.value)}
+                            placeholder="Pega tu código HTML aquí..."
+                            className="w-full h-32 p-3 border border-gray-300 dark:border-gray-600 rounded-md resize-none text-sm font-mono bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-gray-100"
+                            autoFocus
+                        />
+                    </div>
+                </div>
+                <DialogFooter className="gap-2">
+                    <Button
+                        type="button"
+                        onClick={handleClear}
+                        data-style="ghost"
+                        className="px-3 py-2"
+                    >
+                        Limpiar
+                    </Button>
+                    <Button
+                        type="button"
+                        onClick={insertHtml}
+                        disabled={!htmlContent.trim()}
+                        className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
+                    >
+                        Insertar HTML
+                    </Button>
+                </DialogFooter>
+            </DialogContent>
+        </Dialog>
+    );
+};
 
 const MainToolbarContent = ({
     onHighlighterClick,
@@ -144,6 +282,7 @@ const MainToolbarContent = ({
 
             <ToolbarGroup>
                 <ImageUploadButton text="Add" />
+                {!isMobile ? <HtmlPopover /> : <HtmlDialogMobile />}
             </ToolbarGroup>
 
             <Spacer />
@@ -270,11 +409,7 @@ export function SimpleEditor({
                     />
                 ) : (
                     <MobileToolbarContent
-                        type={
-                            mobileView === 'highlighter'
-                                ? 'highlighter'
-                                : 'link'
-                        }
+                        type={mobileView}
                         onBack={() => setMobileView('main')}
                     />
                 )}
