@@ -9,6 +9,7 @@ export const CvBaseSchema = BaseSchema.extend({
     version: z.string(),
     resume: z.string(),
     language: z.string().default('esp'),
+    technical_contributions_projects: z.string().optional(),
 });
 
 export const CvItemSchema = CvBaseSchema.required({
