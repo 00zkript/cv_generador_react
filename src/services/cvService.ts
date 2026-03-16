@@ -1,5 +1,5 @@
 import api from '@/plugins/axios';
-import { Cv, PaginatedCvs } from '@/types/Cv';
+import type { Cv, PaginatedCvs, CvContentData, CreateCvData, UpdateCvData, GenerateCvData, GenerateCvResponse } from '@/types/Cv';
 
 const URL_API = import.meta.env.VITE_API_URL_BASE || 'http://localhost:3000';
 const URL = URL_API + '/cvs';
@@ -16,12 +16,12 @@ async function show(id: number): Promise<Cv> {
     return response.data;
 }
 
-async function store<T>(data: T) {
+async function store(data: CreateCvData) {
     const response = await api.post(URL, data);
     return response.data;
 }
 
-async function update<T>(id: number, data: T) {
+async function update(id: number, data: UpdateCvData) {
     const response = await api.put(`${URL}/${id}`, data);
     return response.data;
 }
@@ -31,24 +31,13 @@ async function destroy(id: number) {
     return response.data;
 }
 
-export interface GenerateCvData {
-    title?: string;
-    target_role: string;
-    target_company: string;
-    job_description: string;
-}
-
-export interface GenerateCvResponse {
-    cv_id: number;
-    version_id: number;
-    target_role: string;
-    target_company: string;
-    generated_data: Record<string, unknown>;
-    created_at: string;
-}
-
 async function generate(data: GenerateCvData): Promise<GenerateCvResponse> {
     const response = await api.post<GenerateCvResponse>(`${URL}/generate`, data);
+    return response.data;
+}
+
+async function addVersion(id: number, content: CvContentData) {
+    const response = await api.post(`${URL}/${id}/versions`, { content_json: content });
     return response.data;
 }
 
@@ -57,6 +46,7 @@ function pdf(id: number, versionId?: number) {
     return `${URL}/${id}/pdf${params}`;
 }
 
+export type { Cv, PaginatedCvs, CvContentData, CreateCvData, UpdateCvData, GenerateCvData, GenerateCvResponse };
 export default {
     index,
     show,
@@ -64,5 +54,6 @@ export default {
     update,
     destroy,
     generate,
+    addVersion,
     pdf,
 };

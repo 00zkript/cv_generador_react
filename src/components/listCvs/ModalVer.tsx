@@ -1,65 +1,69 @@
+import { Cv } from '@/types/Cv';
 import {
     Dialog,
     DialogContent,
-    DialogDescription,
-    DialogTitle,
-    DialogFooter,
     DialogHeader,
+    DialogTitle,
 } from '@/components/ui/dialog';
-import { Button } from '../ui/button';
+import { Loader2 } from 'lucide-react';
 
-export interface ModalVerType {
+interface ModalVerProps {
     open: boolean;
     setOpen: (open: boolean) => void;
-    loadingModal: boolean | null;
+    loadingModal: boolean;
     errorModal: string | null;
-    modalData: object | null;
+    modalData: Cv | null;
 }
 
-function ModalVer({
-    open: open,
-    setOpen: setOpen,
+export default function ModalVer({
+    open,
+    setOpen,
     loadingModal,
     errorModal,
     modalData,
-}: ModalVerType) {
+}: ModalVerProps) {
     return (
         <Dialog open={open} onOpenChange={setOpen}>
-            <DialogContent>
+            <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto">
                 <DialogHeader>
-                    <DialogTitle>Detalle del CV</DialogTitle>
-                    <DialogDescription>
-                        {loadingModal && 'Cargando...'}
-                        {errorModal && (
-                            <span className="text-red-500">{errorModal}</span>
-                        )}
-                    </DialogDescription>
+                    <DialogTitle>
+                        {modalData?.title || 'CV'}
+                    </DialogTitle>
                 </DialogHeader>
-                {modalData && (
-                    <pre className="bg-gray-100 dark:bg-gray-800 p-2 rounded text-xs max-h-64 overflow-auto">
-                        {JSON.stringify(modalData, null, 2)}
-                    </pre>
+
+                {loadingModal && (
+                    <div className="flex justify-center py-8">
+                        <Loader2 className="h-8 w-8 animate-spin" />
+                    </div>
                 )}
-                <DialogFooter>
-                    <Button
-                        onClick={() => {
-                            if (modalData) {
-                                navigator.clipboard.writeText(
-                                    JSON.stringify(modalData, null, 2)
-                                );
-                            }
-                        }}
-                        disabled={!modalData}
-                    >
-                        Copiar
-                    </Button>
-                    <Button variant="secondary" onClick={() => setOpen(false)}>
-                        Cerrar
-                    </Button>
-                </DialogFooter>
+
+                {errorModal && (
+                    <div className="text-destructive py-4">{errorModal}</div>
+                )}
+
+                {modalData && !loadingModal && (
+                    <div className="space-y-4">
+                        <div>
+                            <h3 className="font-semibold">Puesto Objetivo</h3>
+                            <p>{modalData.target_role || '-'}</p>
+                        </div>
+                        <div>
+                            <h3 className="font-semibold">Empresa</h3>
+                            <p>{modalData.target_company || '-'}</p>
+                        </div>
+                        <div>
+                            <h3 className="font-semibold">Descripción</h3>
+                            <p className="whitespace-pre-wrap">{modalData.job_description || '-'}</p>
+                        </div>
+                        {modalData.versions && modalData.versions.length > 0 && (
+                            <div>
+                                <h3 className="font-semibold">Versiones</h3>
+                                <p>{modalData.versions.length} versión(es)</p>
+                            </div>
+                        )}
+                    </div>
+                )}
             </DialogContent>
         </Dialog>
     );
 }
-
-export default ModalVer;

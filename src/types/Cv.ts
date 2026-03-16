@@ -1,40 +1,32 @@
-import { z } from 'zod';
+export interface CvJobKeyword {
+    id?: number;
+    keyword: string;
+    weight?: number;
+}
 
-export const CvJobKeywordSchema = z.object({
-    id: z.number(),
-    cv_id: z.number(),
-    keyword: z.string(),
-    weight: z.number(),
-    position: z.number(),
-});
+export interface CvVersion {
+    id: number;
+    cv_id: number;
+    version_number: number;
+    prompt_used: string | null;
+    content_json: CvContentData | null;
+    ats_score: number | null;
+    position: number;
+    created_at: string;
+}
 
-export const CvVersionSchema = z.object({
-    id: z.number(),
-    cv_id: z.number(),
-    version_number: z.number(),
-    prompt_used: z.string().nullable(),
-    content_json: z.record(z.unknown()).nullable(),
-    ats_score: z.number().nullable(),
-    position: z.number(),
-    created_at: z.string(),
-});
-
-export const CvSchema = z.object({
-    id: z.number(),
-    user_id: z.number(),
-    title: z.string().nullable(),
-    target_role: z.string().nullable(),
-    target_company: z.string().nullable(),
-    job_description: z.string().nullable(),
-    created_at: z.string(),
-    updated_at: z.string(),
-    job_keywords: z.array(CvJobKeywordSchema).optional(),
-    versions: z.array(CvVersionSchema).optional(),
-});
-
-export type CvJobKeyword = z.infer<typeof CvJobKeywordSchema>;
-export type CvVersion = z.infer<typeof CvVersionSchema>;
-export type Cv = z.infer<typeof CvSchema>;
+export interface Cv {
+    id: number;
+    user_id: number;
+    title: string | null;
+    target_role: string | null;
+    target_company: string | null;
+    job_description: string | null;
+    created_at: string;
+    updated_at: string;
+    job_keywords?: CvJobKeyword[];
+    versions?: CvVersion[];
+}
 
 export interface PaginatedCvs {
     total: number;
@@ -47,22 +39,72 @@ export interface PaginatedCvs {
     data: Cv[];
 }
 
-export const CvBaseSchema = z.object({
-    id: z.number().int().nullable(),
-    name: z.string(),
-    subject: z.string(),
-    version: z.string(),
-    resume: z.string(),
-    language: z.string().default('esp'),
-    technical_contributions_projects: z.string().optional(),
-});
+export interface ExperienceHighlight {
+    company: string;
+    role: string;
+    period: string;
+    highlights: string[];
+}
 
-export const CvItemSchema = CvBaseSchema.extend({
-    id: z.number().int(),
-    created_at: z.string(),
-    updated_at: z.string(),
-    contact: z.any().optional(),
-});
+export interface EducationHighlight {
+    institution: string;
+    degree: string;
+    field_of_study?: string;
+    period: string;
+}
 
-export type CvBase = z.infer<typeof CvBaseSchema>;
-export type CvItem = z.infer<typeof CvItemSchema>;
+export interface CvContentData {
+    summary: string;
+    keywords: string[];
+    skills: string[];
+    experience_highlights: ExperienceHighlight[];
+    education_highlights: EducationHighlight[];
+    ats_optimized_content?: Record<string, unknown>;
+}
+
+export interface CreateCvData {
+    title?: string;
+    target_role?: string;
+    target_company?: string;
+    job_description?: string;
+    version?: {
+        content?: string;
+        generated_with?: string;
+        ats_score?: number;
+    };
+}
+
+export interface UpdateCvData {
+    title?: string;
+    target_role?: string;
+    target_company?: string;
+    job_description?: string;
+}
+
+export interface GenerateCvData {
+    title?: string;
+    target_role: string;
+    target_company: string;
+    job_description: string;
+}
+
+export interface GenerateCvResponse {
+    cv_id: number;
+    version_id: number;
+    target_role: string;
+    target_company: string;
+    generated_data: CvContentData;
+    created_at: string;
+}
+
+export const CvBaseSchema = {
+    id: null,
+    name: '',
+    subject: '',
+    version: '',
+    resume: '',
+    language: 'esp',
+    technical_contributions_projects: '',
+};
+
+export type CvBase = typeof CvBaseSchema;

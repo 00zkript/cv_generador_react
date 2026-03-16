@@ -8,30 +8,30 @@ export interface TablesCvsType {
 
 function TablesCvs({ data, renderMenu }: TablesCvsType) {
     return (
-        <table className="table-auto w-full table-c1">
+        <table className="table-auto w-full">
             <thead>
-                <tr className="text-center">
-                    <th>Acción</th>
-                    <th>#ID</th>
-                    <th>Título</th>
-                    <th>Rol Objetivo</th>
-                    <th>Empresa Objetivo</th>
-                    <th>Versiones</th>
-                    <th>Fecha creación</th>
+                <tr className="text-center bg-muted">
+                    <th className="px-4 py-2">Acción</th>
+                    <th className="px-4 py-2">#ID</th>
+                    <th className="px-4 py-2">Título</th>
+                    <th className="px-4 py-2">Rol Objetivo</th>
+                    <th className="px-4 py-2">Empresa</th>
+                    <th className="px-4 py-2">Versiones</th>
+                    <th className="px-4 py-2">Fecha</th>
                 </tr>
             </thead>
             <tbody>
                 {data?.map((item) => (
-                    <tr key={item.id}>
-                        <td className="text-center">{renderMenu(item)}</td>
-                        <td className="text-center">
+                    <tr key={item.id} className="border-b">
+                        <td className="text-center px-2 py-3">{renderMenu(item)}</td>
+                        <td className="text-center px-2 py-3">
                             {String(item.id).padStart(4, '0')}
                         </td>
-                        <td>{item.title || 'Sin título'}</td>
-                        <td>{item.target_role || '-'}</td>
-                        <td>{item.target_company || '-'}</td>
-                        <td className="text-center">{item.versions?.length || 0}</td>
-                        <td className="text-center">
+                        <td className="px-2 py-3">{item.title || 'Sin título'}</td>
+                        <td className="px-2 py-3">{item.target_role || '-'}</td>
+                        <td className="px-2 py-3">{item.target_company || '-'}</td>
+                        <td className="text-center px-2 py-3">{item.versions?.length || 0}</td>
+                        <td className="text-center px-2 py-3">
                             {item.created_at ? format(item.created_at, 'medium', 'es-PE') : '-'}
                         </td>
                     </tr>

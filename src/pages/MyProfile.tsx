@@ -285,27 +285,38 @@ export default function MyProfile() {
                         <p className="text-muted-foreground text-center py-4">No hay habilidades agregadas</p>
                     ) : (
                         skills.map((skill, index) => (
-                            <div key={index} className="flex gap-2 items-start">
+                            <div key={index} className="flex gap-2 items-start flex-wrap">
                                 <Input
-                                    placeholder="Nombre de habilidad"
-                                    className="flex-1"
+                                    placeholder="Habilidad"
+                                    className="flex-1 min-w-[150px]"
                                     value={skill.name}
                                     onChange={(e) => updateSkill(index, { ...skill, name: e.target.value })}
                                 />
+                                <Input
+                                    type="number"
+                                    placeholder="Años"
+                                    className="w-[70px]"
+                                    min={0}
+                                    max={50}
+                                    value={skill.years_experience ?? ''}
+                                    onChange={(e) => updateSkill(index, { ...skill, years_experience: e.target.value ? parseInt(e.target.value) : undefined })}
+                                />
                                 <select
-                                    className="flex h-9 w-[140px] rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm"
-                                    value={skill.level}
+                                    className="flex h-9 w-[120px] rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm"
+                                    value={skill.level || ''}
                                     onChange={(e) => updateSkill(index, { ...skill, level: e.target.value as SkillData['level'] })}
                                 >
+                                    <option value="">Nivel</option>
                                     {SKILL_LEVELS.map(level => (
                                         <option key={level.value} value={level.value}>{level.label}</option>
                                     ))}
                                 </select>
                                 <select
-                                    className="flex h-9 w-[140px] rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm"
-                                    value={skill.category}
+                                    className="flex h-9 w-[130px] rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm"
+                                    value={skill.category || ''}
                                     onChange={(e) => updateSkill(index, { ...skill, category: e.target.value as SkillData['category'] })}
                                 >
+                                    <option value="">Categoría</option>
                                     {SKILL_CATEGORIES.map(cat => (
                                         <option key={cat.value} value={cat.value}>{cat.label}</option>
                                     ))}

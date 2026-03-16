@@ -7,8 +7,7 @@ import Login from '@/pages/Login';
 import Register from '@/pages/Register';
 import Dashboard from '@/pages/Dashboard';
 import ListaCvs from '@/pages/ListaCvs';
-import CreateCv from '@/pages/CreateCv';
-import FormUpdateCv from '@/pages/FormUpdateCv';
+import CvEditor from '@/pages/CvEditor';
 import MyProfile from '@/pages/MyProfile';
 
 import MainLayout from '@/layouts/MainLayout';
@@ -81,7 +80,17 @@ function AppRoutes() {
                 }
             >
                 <Route index element={<Dashboard />} />
-                <Route path="mi-perfil" element={<MyProfile />} />
+            </Route>
+
+            <Route
+                path="/mi-perfil"
+                element={
+                    <ProtectedRoute>
+                        <MainLayout />
+                    </ProtectedRoute>
+                }
+            >
+                <Route index element={<MyProfile />} />
             </Route>
 
             <Route
@@ -103,7 +112,7 @@ function AppRoutes() {
                     </ProtectedRoute>
                 }
             >
-                <Route index element={<CreateCv />} />
+                <Route index element={<CvEditor />} />
             </Route>
 
             <Route
@@ -114,18 +123,7 @@ function AppRoutes() {
                     </ProtectedRoute>
                 }
             >
-                <Route index element={<FormUpdateCv />} />
-            </Route>
-
-            <Route
-                path="/mi-perfil"
-                element={
-                    <ProtectedRoute>
-                        <MainLayout />
-                    </ProtectedRoute>
-                }
-            >
-                <Route index element={<MyProfile />} />
+                <Route index element={<CvEditor />} />
             </Route>
 
             <Route path="/" element={<Navigate to="/dashboard" replace />} />

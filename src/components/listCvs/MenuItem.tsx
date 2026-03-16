@@ -9,7 +9,6 @@ import { Button } from '../ui/button';
 import {
     Ellipsis,
     Eye,
-    FilePenLine,
     FileText,
     Trash2,
 } from 'lucide-react';
@@ -42,7 +41,6 @@ function MenuItem({
                 </DropdownMenuItem>
                 <DropdownMenuItem asChild>
                     <NavLink to={'/cv/editar/' + item.id}>
-                        <FilePenLine />
                         Editar
                     </NavLink>
                 </DropdownMenuItem>
@@ -52,7 +50,7 @@ function MenuItem({
                 </DropdownMenuItem>
                 <DropdownMenuItem
                     onClick={() => handleDelete(item.id)}
-                    variant="destructive"
+                    className="text-destructive"
                 >
                     <Trash2 />
                     Eliminar
