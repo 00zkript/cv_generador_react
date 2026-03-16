@@ -1,7 +1,6 @@
 // import Section from "@/components/Section";
 import NoRecords from '@/components/NoRecords';
 import { SkillBase } from '@/types/Skill';
-import FormSkill from './FormSkill';
 import { Button } from '@/components/ui/button';
 import { CirclePlus, Trash2 } from 'lucide-react';
 import Acordeon from '@/components/Acordeon';

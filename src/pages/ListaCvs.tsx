@@ -1,7 +1,7 @@
 import Page from '@/components/Page';
 import { Button } from '@/components/ui/button';
 import cvService from '@/services/cvService';
-import { CvItem } from '@/types/Cv';
+import { Cv, PaginatedCvs } from '@/types/Cv';
 import { CirclePlus } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { NavLink } from 'react-router';
@@ -13,31 +13,21 @@ import ModalVer from '@/components/listCvs/ModalVer';
 import DialogConfirm from '@/components/DialogConfirm';
 
 export default function ListaCvs() {
-    const [dataPage, setDataPage] = useState<{
-        total: number;
-        per_page: number;
-        current_page: number;
-        last_page: number;
-        total_pages: number;
-        data: CvItem[];
-    }>({
+    const [dataPage, setDataPage] = useState<PaginatedCvs>({
         total: 0,
         per_page: 5,
         current_page: 1,
         last_page: 1,
         total_pages: 1,
+        from: 0,
+        to: 0,
         data: [],
     });
 
     const [loadingModal, setLoadingModal] = useState<boolean>(false);
     const [modalOpen, setModalOpen] = useState<boolean>(false);
     const [errorModal, setErrorModal] = useState<string | null>(null);
-    const [modalData, setModalData] = useState<object | null>(null);
-
-    const [modalCofirmDuplicate, setModalCofirmDuplicate] = useState<{
-        open: boolean;
-        id: number | null;
-    }>({ open: false, id: null });
+    const [modalData, setModalData] = useState<Cv | null>(null);
 
     const [modalCofirmDelete, setModalCofirmDelete] = useState<{
         open: boolean;
@@ -46,32 +36,14 @@ export default function ListaCvs() {
 
     const getCvs = async (page = 1) => {
         try {
-            const data = await cvService.paginate(page, dataPage.per_page);
+            const data = await cvService.index(page, dataPage.per_page);
             setDataPage(data);
         } catch (error) {
             console.error(error);
         }
     };
 
-    const handleDuplicar = async () => {
-        console.log('Duplicando Cv...');
-        if (!modalCofirmDuplicate.id) {
-            return null;
-        }
-
-        try {
-            await cvService.duplicate(modalCofirmDuplicate.id);
-            getCvs();
-            setModalCofirmDuplicate({ open: false, id: null });
-        } catch (error) {
-            console.error(error);
-        }
-    };
-
     const handlePdf = async (id: number) => {
-        // console.log('Imprimiendo Cv...');
-        // console.log(id);
-        // http://localhost:8000/cvs/1/pdf
         const a = document.createElement('a');
         a.href = cvService.pdf(id);
         a.target = '_blank';
@@ -79,18 +51,12 @@ export default function ListaCvs() {
     };
 
     const handleDelete = async () => {
-        // console.log('Eliminando Cv...');
-
         if (!modalCofirmDelete.id) {
             return null;
         }
 
         try {
             await cvService.destroy(modalCofirmDelete.id);
-            // setDataPage((prev) => ({
-            //     ...dataPage,
-            //     data: prev.data.filter((item) => item.id !== id),
-            // }));
             getCvs();
             setModalCofirmDelete({ open: false, id: null });
         } catch (error) {
@@ -119,12 +85,12 @@ export default function ListaCvs() {
     return (
         <Page>
             <h1 className="text-center text-lg font-bold pb-4">
-                Listado de CVs
+                Mis CVs
             </h1>
 
             <div className="flex justify-end pb-4">
                 <Button variant={'default'} asChild>
-                    <NavLink to="cv/crear">
+                    <NavLink to="/cv/crear">
                         <CirclePlus />
                         Nuevo CV
                     </NavLink>
@@ -133,23 +99,17 @@ export default function ListaCvs() {
 
             <TablesCvs
                 data={dataPage.data}
-                renderMenu={(item) => (
+                renderMenu={(item: Cv) => (
                     <MenuItem
                         item={item}
-                        handleDuplicar={() =>
-                            setModalCofirmDuplicate({
-                                open: true,
-                                id: item.id,
-                            })
-                        }
-                        handlePdf={handlePdf}
+                        handlePdf={() => handlePdf(item.id)}
                         handleDelete={() =>
                             setModalCofirmDelete({
                                 open: true,
                                 id: item.id,
                             })
                         }
-                        handleView={handleView}
+                        handleView={() => handleView(item.id)}
                     />
                 )}
             />
@@ -167,16 +127,6 @@ export default function ListaCvs() {
                 loadingModal={loadingModal}
                 errorModal={errorModal}
                 modalData={modalData}
-            />
-
-            <DialogConfirm
-                open={modalCofirmDuplicate.open}
-                onConfirm={handleDuplicar}
-                onCancel={() =>
-                    setModalCofirmDuplicate({ open: false, id: null })
-                }
-                title="¿Está seguro de duplicar el registro?"
-                variant="success"
             />
 
             <DialogConfirm

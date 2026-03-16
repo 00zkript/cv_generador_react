@@ -1,9 +1,9 @@
-import { CvItem } from '@/types/Cv';
+import { Cv } from '@/types/Cv';
 import { format } from '@formkit/tempo';
 
 export interface TablesCvsType {
-    data: CvItem[];
-    renderMenu: (item: CvItem) => React.ReactNode;
+    data: Cv[];
+    renderMenu: (item: Cv) => React.ReactNode;
 }
 
 function TablesCvs({ data, renderMenu }: TablesCvsType) {
@@ -13,30 +13,26 @@ function TablesCvs({ data, renderMenu }: TablesCvsType) {
                 <tr className="text-center">
                     <th>Acción</th>
                     <th>#ID</th>
-                    <th>Idioma</th>
-                    <th>Nombre</th>
-                    <th>Propósito</th>
-                    <th>Version</th>
+                    <th>Título</th>
+                    <th>Rol Objetivo</th>
+                    <th>Empresa Objetivo</th>
+                    <th>Versiones</th>
                     <th>Fecha creación</th>
-                    <th>Ultima modificación</th>
                 </tr>
             </thead>
             <tbody>
-                {data?.map((item, index) => (
-                    <tr key={index}>
+                {data?.map((item) => (
+                    <tr key={item.id}>
                         <td className="text-center">{renderMenu(item)}</td>
                         <td className="text-center">
                             {String(item.id).padStart(4, '0')}
                         </td>
-                        <td>{item.language}</td>
-                        <td>{item.name}</td>
-                        <td>{item.subject}</td>
-                        <td className="text-center">{item.version}</td>
+                        <td>{item.title || 'Sin título'}</td>
+                        <td>{item.target_role || '-'}</td>
+                        <td>{item.target_company || '-'}</td>
+                        <td className="text-center">{item.versions?.length || 0}</td>
                         <td className="text-center">
-                            {format(item.created_at ?? '', 'medium', 'es-Pe')}
-                        </td>
-                        <td className="text-center">
-                            {format(item.updated_at ?? '', 'medium', 'es-Pe')}
+                            {item.created_at ? format(item.created_at, 'medium', 'es-PE') : '-'}
                         </td>
                     </tr>
                 ))}

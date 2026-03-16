@@ -1,27 +1,146 @@
-import { Route, Routes } from "react-router";
-import ListaCvs from "./pages/ListaCvs";
-import FormCreateCv from "./pages/FormCreateCv";
-import FormUpdateCv from "./pages/FormUpdateCv";
-import LayoutWeb from "./layouts/LayoutWeb";
-import { ThemeProvider } from "@/components/theme-provider";
-import Layout from "./layouts/Layout";
+import { Routes, Route, Navigate } from 'react-router';
+import { AuthProvider, useAuth } from '@/contexts/AuthContext';
+import { ThemeProvider } from '@/components/theme-provider';
+import { ToastContainer } from 'react-toastify';
 
+import Login from '@/pages/Login';
+import Register from '@/pages/Register';
+import Dashboard from '@/pages/Dashboard';
+import ListaCvs from '@/pages/ListaCvs';
+import CreateCv from '@/pages/CreateCv';
+import FormUpdateCv from '@/pages/FormUpdateCv';
+import MyProfile from '@/pages/MyProfile';
+
+import MainLayout from '@/layouts/MainLayout';
+import AuthLayout from '@/layouts/AuthLayout';
+
+function ProtectedRoute({ children }: { children: React.ReactNode }) {
+    const { isAuthenticated, isLoading } = useAuth();
+
+    if (isLoading) {
+        return (
+            <div className="min-h-screen flex items-center justify-center">
+                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+            </div>
+        );
+    }
+
+    if (!isAuthenticated) {
+        return <Navigate to="/login" replace />;
+    }
+
+    return <>{children}</>;
+}
+
+function PublicRoute({ children }: { children: React.ReactNode }) {
+    const { isAuthenticated, isLoading } = useAuth();
+
+    if (isLoading) {
+        return (
+            <div className="min-h-screen flex items-center justify-center">
+                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+            </div>
+        );
+    }
+
+    if (isAuthenticated) {
+        return <Navigate to="/dashboard" replace />;
+    }
+
+    return <>{children}</>;
+}
+
+function AppRoutes() {
+    return (
+        <Routes>
+            <Route element={<AuthLayout />}>
+                <Route
+                    path="/login"
+                    element={
+                        <PublicRoute>
+                            <Login />
+                        </PublicRoute>
+                    }
+                />
+                <Route
+                    path="/register"
+                    element={
+                        <PublicRoute>
+                            <Register />
+                        </PublicRoute>
+                    }
+                />
+            </Route>
+
+            <Route
+                path="/dashboard"
+                element={
+                    <ProtectedRoute>
+                        <MainLayout />
+                    </ProtectedRoute>
+                }
+            >
+                <Route index element={<Dashboard />} />
+                <Route path="mi-perfil" element={<MyProfile />} />
+            </Route>
+
+            <Route
+                path="/cvs"
+                element={
+                    <ProtectedRoute>
+                        <MainLayout />
+                    </ProtectedRoute>
+                }
+            >
+                <Route index element={<ListaCvs />} />
+            </Route>
+
+            <Route
+                path="/cv/crear"
+                element={
+                    <ProtectedRoute>
+                        <MainLayout />
+                    </ProtectedRoute>
+                }
+            >
+                <Route index element={<CreateCv />} />
+            </Route>
+
+            <Route
+                path="/cv/editar/:id"
+                element={
+                    <ProtectedRoute>
+                        <MainLayout />
+                    </ProtectedRoute>
+                }
+            >
+                <Route index element={<FormUpdateCv />} />
+            </Route>
+
+            <Route
+                path="/mi-perfil"
+                element={
+                    <ProtectedRoute>
+                        <MainLayout />
+                    </ProtectedRoute>
+                }
+            >
+                <Route index element={<MyProfile />} />
+            </Route>
+
+            <Route path="/" element={<Navigate to="/dashboard" replace />} />
+            <Route path="*" element={<Navigate to="/dashboard" replace />} />
+        </Routes>
+    );
+}
 
 function App() {
-    
     return (
         <ThemeProvider defaultTheme="dark" storageKey="vite-ui-theme">
-            <Routes>
-                <Route element={<Layout/>} >
-                    <Route path="/" index element={<ListaCvs />} />
-                    <Route element={<LayoutWeb/>} >
-                        <Route path="cvs" element={<ListaCvs/>}  />
-                        <Route path="cv/crear" element={<FormCreateCv/>}  />   
-                        <Route path="cv/editar/:id" element={<FormUpdateCv/>}  />   
-                    </Route>
-                </Route>
-                <Route path="*" element={<div>Not Found</div>}  />   
-            </Routes>
+            <AuthProvider>
+                <AppRoutes />
+                <ToastContainer position="top-right" autoClose={3000} />
+            </AuthProvider>
         </ThemeProvider>
     );
 }

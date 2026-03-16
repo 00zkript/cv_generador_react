@@ -1,4 +1,4 @@
-import { CvItem } from '@/types/Cv';
+import { Cv } from '@/types/Cv';
 import {
     DropdownMenu,
     DropdownMenuContent,
@@ -10,15 +10,13 @@ import {
     Ellipsis,
     Eye,
     FilePenLine,
-    FileStack,
     FileText,
     Trash2,
 } from 'lucide-react';
 import { NavLink } from 'react-router';
 
 interface PropsMenuItem {
-    item: CvItem;
-    handleDuplicar: (id: number) => void;
+    item: Cv;
     handlePdf: (id: number) => void;
     handleDelete: (id: number) => void;
     handleView: (id: number) => void;
@@ -26,7 +24,6 @@ interface PropsMenuItem {
 
 function MenuItem({
     item,
-    handleDuplicar,
     handlePdf,
     handleDelete,
     handleView,
@@ -43,12 +40,8 @@ function MenuItem({
                     <Eye />
                     Ver
                 </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => handleDuplicar(item.id)}>
-                    <FileStack />
-                    Duplicar
-                </DropdownMenuItem>
                 <DropdownMenuItem asChild>
-                    <NavLink to={'cv/editar/' + item.id}>
+                    <NavLink to={'/cv/editar/' + item.id}>
                         <FilePenLine />
                         Editar
                     </NavLink>

@@ -1,56 +1,68 @@
-import axios from '@/plugins/axios';
+import api from '@/plugins/axios';
+import { Cv, PaginatedCvs } from '@/types/Cv';
 
-const URL_API = import.meta.env.VITE_API_URL_BASE;
+const URL_API = import.meta.env.VITE_API_URL_BASE || 'http://localhost:3000';
 const URL = URL_API + '/cvs';
 
-async function index() {
-    const response = await axios.get(`${URL}`);
-    return response.data;
-}
-
-async function paginate(page = 1, perPage = 10) {
-    const response = await axios.get(`${URL}/paginate`, {
-        params: { page, per_page: perPage },
+async function index(page = 1, limit = 10): Promise<PaginatedCvs> {
+    const response = await api.get<PaginatedCvs>(URL, {
+        params: { page, limit },
     });
     return response.data;
 }
 
-async function show(id: number) {
-    const response = await axios.get(`${URL}/${id}`);
+async function show(id: number): Promise<Cv> {
+    const response = await api.get<Cv>(`${URL}/${id}`);
     return response.data;
 }
 
 async function store<T>(data: T) {
-    const response = await axios.post(`${URL}/`, data);
+    const response = await api.post(URL, data);
     return response.data;
 }
 
 async function update<T>(id: number, data: T) {
-    const response = await axios.put(`${URL}/${id}`, data);
+    const response = await api.put(`${URL}/${id}`, data);
     return response.data;
 }
 
 async function destroy(id: number) {
-    const response = await axios.delete(`${URL}/${id}`);
+    const response = await api.delete(`${URL}/${id}`);
     return response.data;
 }
 
-async function duplicate(id: number) {
-    const response = await axios.post(`${URL}/${id}/duplicate`);
+export interface GenerateCvData {
+    title?: string;
+    target_role: string;
+    target_company: string;
+    job_description: string;
+}
+
+export interface GenerateCvResponse {
+    cv_id: number;
+    version_id: number;
+    target_role: string;
+    target_company: string;
+    generated_data: Record<string, unknown>;
+    created_at: string;
+}
+
+async function generate(data: GenerateCvData): Promise<GenerateCvResponse> {
+    const response = await api.post<GenerateCvResponse>(`${URL}/generate`, data);
     return response.data;
 }
 
-function pdf(id: number) {
-    return `${URL}/${id}/pdf`;
+function pdf(id: number, versionId?: number) {
+    const params = versionId ? `?versionId=${versionId}` : '';
+    return `${URL}/${id}/pdf${params}`;
 }
 
 export default {
     index,
-    paginate,
     show,
     store,
     update,
     destroy,
-    duplicate,
+    generate,
     pdf,
 };
