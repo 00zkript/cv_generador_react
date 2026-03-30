@@ -36,8 +36,10 @@ export interface EducationData {
     institution: string;
     degree?: string;
     field_of_study?: string;
+    location?: string;
     start_date?: string;
     end_date?: string;
+    current?: boolean;
 }
 
 export interface ProjectData {

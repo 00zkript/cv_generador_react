@@ -5,7 +5,9 @@ import cvService, { Cv, CvContentData, CreateCvData } from '@/services/cvService
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Loader2, Sparkles, Save, FileText, Plus, Trash2, ArrowLeft } from 'lucide-react';
+import EducationForm, { getEmptyEducation } from '@/components/EducationForm';
+import { EducationItem } from '@/types/forms';
+import { Loader2, Sparkles, Save, FileText, ArrowLeft, Plus, Trash2 } from 'lucide-react';
 import { toast } from 'react-toastify';
 
 interface ExperienceItem {
@@ -13,13 +15,6 @@ interface ExperienceItem {
     role: string;
     period: string;
     highlights: string[];
-}
-
-interface EducationItem {
-    institution: string;
-    degree: string;
-    field_of_study: string;
-    period: string;
 }
 
 export default function CvEditor() {
@@ -83,7 +78,10 @@ export default function CvEditor() {
                     institution: edu.institution,
                     degree: edu.degree,
                     field_of_study: edu.field_of_study || '',
-                    period: edu.period,
+                    location: edu.location || '',
+                    start_date: edu.start_date || '',
+                    end_date: edu.end_date || '',
+                    current: edu.current || false,
                 })) || [],
             });
         } catch (error) {
@@ -123,11 +121,11 @@ export default function CvEditor() {
     const addEducation = () => {
         setFormData(prev => ({
             ...prev,
-            education: [...prev.education, { institution: '', degree: '', field_of_study: '', period: '' }]
+            education: [...prev.education, getEmptyEducation()]
         }));
     };
 
-    const updateEducation = (index: number, field: keyof EducationItem, value: string) => {
+    const updateEducation = (index: number, field: keyof EducationItem, value: string | boolean) => {
         setFormData(prev => {
             const education = [...prev.education];
             education[index] = { ...education[index], [field]: value };
@@ -156,6 +154,7 @@ export default function CvEditor() {
             })),
             education_highlights: formData.education.map(edu => ({
                 ...edu,
+                degree: edu.degree || '',
                 field_of_study: edu.field_of_study || undefined,
             })),
             ats_optimized_content: {},
@@ -226,7 +225,10 @@ export default function CvEditor() {
                     institution: edu.institution,
                     degree: edu.degree,
                     field_of_study: edu.field_of_study || '',
-                    period: edu.period,
+                    location: edu.location || '',
+                    start_date: edu.start_date || '',
+                    end_date: edu.end_date || '',
+                    current: edu.current || false,
                 })) || [],
             }));
 
@@ -429,48 +431,16 @@ export default function CvEditor() {
             </Card>
 
             <Card>
-                <CardHeader className="flex flex-row items-center justify-between">
+                <CardHeader>
                     <CardTitle>Educación</CardTitle>
-                    <Button variant="outline" size="sm" onClick={addEducation}>
-                        <Plus className="h-4 w-4 mr-1" /> Agregar
-                    </Button>
                 </CardHeader>
-                <CardContent className="space-y-4">
-                    {formData.education.length === 0 ? (
-                        <p className="text-muted-foreground text-center py-4">No hay educación agregada</p>
-                    ) : (
-                        formData.education.map((edu, index) => (
-                            <div key={index} className="flex gap-2 items-start">
-                                <Input
-                                    placeholder="Institución"
-                                    className="flex-1"
-                                    value={edu.institution}
-                                    onChange={(e) => updateEducation(index, 'institution', e.target.value)}
-                                />
-                                <Input
-                                    placeholder="Grado/Título"
-                                    className="flex-1"
-                                    value={edu.degree}
-                                    onChange={(e) => updateEducation(index, 'degree', e.target.value)}
-                                />
-                                <Input
-                                    placeholder="Campo"
-                                    className="flex-1"
-                                    value={edu.field_of_study}
-                                    onChange={(e) => updateEducation(index, 'field_of_study', e.target.value)}
-                                />
-                                <Input
-                                    placeholder="Periodo"
-                                    className="w-32"
-                                    value={edu.period}
-                                    onChange={(e) => updateEducation(index, 'period', e.target.value)}
-                                />
-                                <Button variant="ghost" size="icon" onClick={() => removeEducation(index)}>
-                                    <Trash2 className="h-4 w-4 text-destructive" />
-                                </Button>
-                            </div>
-                        ))
-                    )}
+                <CardContent>
+                    <EducationForm
+                        education={formData.education}
+                        onAdd={addEducation}
+                        onRemove={removeEducation}
+                        onUpdate={updateEducation}
+                    />
                 </CardContent>
             </Card>
 

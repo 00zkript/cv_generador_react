@@ -11,6 +11,7 @@ export const StudyBaseSchema = BaseSchema.extend({
     description: z.string(),
     city: z.string(),
     country: z.string(),
+    location: z.string().optional(),
     current: z.boolean().default(false),
 });
 

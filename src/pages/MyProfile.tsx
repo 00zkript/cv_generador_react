@@ -5,25 +5,13 @@ import userService, { ProfileData, SkillData, ExperienceData, EducationData, Pro
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Plus, Trash2, Save, Loader2, User, Briefcase, GraduationCap, Code, FolderKanban } from 'lucide-react';
+import EducationForm, { getEmptyEducation } from '@/components/EducationForm';
+import SkillsForm, { getEmptySkill } from '@/components/SkillsForm';
+import ExperienceForm, { getEmptyExperience } from '@/components/ExperienceForm';
+import ProjectForm, { getEmptyProject } from '@/components/ProjectForm';
+import { EducationItem, SkillItem, ExperienceItem, ProjectItem } from '@/types/forms';
+import { Save, Loader2, User, Briefcase, GraduationCap, Code, FolderKanban } from 'lucide-react';
 import { toast } from 'react-toastify';
-
-const SKILL_LEVELS = [
-    { value: 'beginner', label: 'Beginner' },
-    { value: 'intermediate', label: 'Intermediate' },
-    { value: 'advanced', label: 'Advanced' },
-    { value: 'expert', label: 'Expert' },
-];
-
-const SKILL_CATEGORIES = [
-    { value: 'programming_language', label: 'Programming Language' },
-    { value: 'framework', label: 'Framework' },
-    { value: 'tool', label: 'Tool' },
-    { value: 'soft_skill', label: 'Soft Skill' },
-    { value: 'database', label: 'Database' },
-    { value: 'devops', label: 'DevOps' },
-    { value: 'other', label: 'Other' },
-];
 
 export default function MyProfile() {
     const { isAuthenticated } = useAuth();
@@ -127,13 +115,15 @@ export default function MyProfile() {
     };
 
     const addSkill = () => {
-        setSkills([...skills, { name: '', level: 'intermediate' }]);
+        setSkills([...skills, getEmptySkill()]);
     };
 
-    const updateSkill = (index: number, data: SkillData) => {
-        const newSkills = [...skills];
-        newSkills[index] = data;
-        setSkills(newSkills);
+    const updateSkill = (index: number, field: keyof SkillItem, value: string | number | undefined) => {
+        setSkills(prev => {
+            const newSkills = [...prev];
+            newSkills[index] = { ...newSkills[index], [field]: value };
+            return newSkills;
+        });
     };
 
     const removeSkill = (index: number) => {
@@ -141,13 +131,15 @@ export default function MyProfile() {
     };
 
     const addExperience = () => {
-        setExperiences([...experiences, { company: '', role: '', is_current: false }]);
+        setExperiences([...experiences, getEmptyExperience()]);
     };
 
-    const updateExperience = (index: number, data: ExperienceData) => {
-        const newExperiences = [...experiences];
-        newExperiences[index] = data;
-        setExperiences(newExperiences);
+    const updateExperience = (index: number, field: keyof ExperienceItem, value: string | boolean | undefined) => {
+        setExperiences(prev => {
+            const newExperiences = [...prev];
+            newExperiences[index] = { ...newExperiences[index], [field]: value };
+            return newExperiences;
+        });
     };
 
     const removeExperience = (index: number) => {
@@ -155,13 +147,15 @@ export default function MyProfile() {
     };
 
     const addEducation = () => {
-        setEducation([...education, { institution: '', degree: '' }]);
+        setEducation([...education, getEmptyEducation()]);
     };
 
-    const updateEducation = (index: number, data: EducationData) => {
-        const newEducation = [...education];
-        newEducation[index] = data;
-        setEducation(newEducation);
+    const updateEducation = (index: number, field: keyof EducationItem, value: string | boolean) => {
+        setEducation(prev => {
+            const newEducation = [...prev];
+            newEducation[index] = { ...newEducation[index], [field]: value };
+            return newEducation;
+        });
     };
 
     const removeEducation = (index: number) => {
@@ -169,13 +163,15 @@ export default function MyProfile() {
     };
 
     const addProject = () => {
-        setProjects([...projects, { title: '', description: '' }]);
+        setProjects([...projects, getEmptyProject()]);
     };
 
-    const updateProject = (index: number, data: ProjectData) => {
-        const newProjects = [...projects];
-        newProjects[index] = data;
-        setProjects(newProjects);
+    const updateProject = (index: number, field: keyof ProjectItem, value: string) => {
+        setProjects(prev => {
+            const newProjects = [...prev];
+            newProjects[index] = { ...newProjects[index], [field]: value };
+            return newProjects;
+        });
     };
 
     const removeProject = (index: number) => {
@@ -271,221 +267,70 @@ export default function MyProfile() {
             </Card>
 
             <Card>
-                <CardHeader className="flex flex-row items-center justify-between">
+                <CardHeader>
                     <CardTitle className="flex items-center gap-2">
                         <Code className="h-5 w-5" />
                         Habilidades
                     </CardTitle>
-                    <Button variant="outline" size="sm" onClick={addSkill}>
-                        <Plus className="h-4 w-4 mr-1" /> Agregar
-                    </Button>
                 </CardHeader>
-                <CardContent className="space-y-4">
-                    {skills.length === 0 ? (
-                        <p className="text-muted-foreground text-center py-4">No hay habilidades agregadas</p>
-                    ) : (
-                        skills.map((skill, index) => (
-                            <div key={index} className="flex gap-2 items-start flex-wrap">
-                                <Input
-                                    placeholder="Habilidad"
-                                    className="flex-1 min-w-[150px]"
-                                    value={skill.name}
-                                    onChange={(e) => updateSkill(index, { ...skill, name: e.target.value })}
-                                />
-                                <Input
-                                    type="number"
-                                    placeholder="Años"
-                                    className="w-[70px]"
-                                    min={0}
-                                    max={50}
-                                    value={skill.years_experience ?? ''}
-                                    onChange={(e) => updateSkill(index, { ...skill, years_experience: e.target.value ? parseInt(e.target.value) : undefined })}
-                                />
-                                <select
-                                    className="flex h-9 w-[120px] rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm"
-                                    value={skill.level || ''}
-                                    onChange={(e) => updateSkill(index, { ...skill, level: e.target.value as SkillData['level'] })}
-                                >
-                                    <option value="">Nivel</option>
-                                    {SKILL_LEVELS.map(level => (
-                                        <option key={level.value} value={level.value}>{level.label}</option>
-                                    ))}
-                                </select>
-                                <select
-                                    className="flex h-9 w-[130px] rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm"
-                                    value={skill.category || ''}
-                                    onChange={(e) => updateSkill(index, { ...skill, category: e.target.value as SkillData['category'] })}
-                                >
-                                    <option value="">Categoría</option>
-                                    {SKILL_CATEGORIES.map(cat => (
-                                        <option key={cat.value} value={cat.value}>{cat.label}</option>
-                                    ))}
-                                </select>
-                                <Button variant="ghost" size="icon" onClick={() => removeSkill(index)}>
-                                    <Trash2 className="h-4 w-4 text-destructive" />
-                                </Button>
-                            </div>
-                        ))
-                    )}
+                <CardContent>
+                    <SkillsForm
+                        skills={skills}
+                        onAdd={addSkill}
+                        onRemove={removeSkill}
+                        onUpdate={updateSkill}
+                    />
                 </CardContent>
             </Card>
 
             <Card>
-                <CardHeader className="flex flex-row items-center justify-between">
+                <CardHeader>
                     <CardTitle className="flex items-center gap-2">
                         <Briefcase className="h-5 w-5" />
                         Experiencia Laboral
                     </CardTitle>
-                    <Button variant="outline" size="sm" onClick={addExperience}>
-                        <Plus className="h-4 w-4 mr-1" /> Agregar
-                    </Button>
                 </CardHeader>
-                <CardContent className="space-y-4">
-                    {experiences.length === 0 ? (
-                        <p className="text-muted-foreground text-center py-4">No hay experiencia laboral agregada</p>
-                    ) : (
-                        experiences.map((exp, index) => (
-                            <div key={index} className="p-4 border rounded-lg space-y-3">
-                                <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                                    <Input
-                                        placeholder="Empresa"
-                                        value={exp.company}
-                                        onChange={(e) => updateExperience(index, { ...exp, company: e.target.value })}
-                                    />
-                                    <Input
-                                        placeholder="Puesto"
-                                        value={exp.role}
-                                        onChange={(e) => updateExperience(index, { ...exp, role: e.target.value })}
-                                    />
-                                    <Input
-                                        type="date"
-                                        value={exp.start_date}
-                                        onChange={(e) => updateExperience(index, { ...exp, start_date: e.target.value })}
-                                    />
-                                    <div className="flex gap-2">
-                                        <Input
-                                            type="date"
-                                            value={exp.end_date}
-                                            disabled={exp.is_current}
-                                            onChange={(e) => updateExperience(index, { ...exp, end_date: e.target.value })}
-                                        />
-                                        <label className="flex items-center gap-1 text-sm">
-                                            <input
-                                                type="checkbox"
-                                                checked={exp.is_current}
-                                                onChange={(e) => updateExperience(index, { ...exp, is_current: e.target.checked, end_date: e.target.checked ? undefined : exp.end_date })}
-                                            />
-                                            Actual
-                                        </label>
-                                    </div>
-                                </div>
-                                <textarea
-                                    className="flex min-h-[60px] w-full rounded-md border border-input bg-transparent px-3 py-2 text-sm shadow-sm placeholder:text-muted-foreground"
-                                    placeholder="Descripción del puesto..."
-                                    value={exp.description}
-                                    onChange={(e) => updateExperience(index, { ...exp, description: e.target.value })}
-                                />
-                                <div className="flex justify-end">
-                                    <Button variant="ghost" size="sm" onClick={() => removeExperience(index)}>
-                                        <Trash2 className="h-4 w-4 text-destructive mr-1" /> Eliminar
-                                    </Button>
-                                </div>
-                            </div>
-                        ))
-                    )}
+                <CardContent>
+                    <ExperienceForm
+                        experiences={experiences}
+                        onAdd={addExperience}
+                        onRemove={removeExperience}
+                        onUpdate={updateExperience}
+                    />
                 </CardContent>
             </Card>
 
             <Card>
-                <CardHeader className="flex flex-row items-center justify-between">
+                <CardHeader>
                     <CardTitle className="flex items-center gap-2">
                         <GraduationCap className="h-5 w-5" />
                         Educación
                     </CardTitle>
-                    <Button variant="outline" size="sm" onClick={addEducation}>
-                        <Plus className="h-4 w-4 mr-1" /> Agregar
-                    </Button>
                 </CardHeader>
-                <CardContent className="space-y-4">
-                    {education.length === 0 ? (
-                        <p className="text-muted-foreground text-center py-4">No hay educación agregada</p>
-                    ) : (
-                        education.map((edu, index) => (
-                            <div key={index} className="flex gap-2 items-start">
-                                <Input
-                                    placeholder="Institución"
-                                    className="flex-1"
-                                    value={edu.institution}
-                                    onChange={(e) => updateEducation(index, { ...edu, institution: e.target.value })}
-                                />
-                                <Input
-                                    placeholder="Grado"
-                                    className="flex-1"
-                                    value={edu.degree}
-                                    onChange={(e) => updateEducation(index, { ...edu, degree: e.target.value })}
-                                />
-                                <Input
-                                    placeholder="Campo de estudio"
-                                    className="flex-1"
-                                    value={edu.field_of_study}
-                                    onChange={(e) => updateEducation(index, { ...edu, field_of_study: e.target.value })}
-                                />
-                                <Button variant="ghost" size="icon" onClick={() => removeEducation(index)}>
-                                    <Trash2 className="h-4 w-4 text-destructive" />
-                                </Button>
-                            </div>
-                        ))
-                    )}
+                <CardContent>
+                    <EducationForm
+                        education={education}
+                        onAdd={addEducation}
+                        onRemove={removeEducation}
+                        onUpdate={updateEducation}
+                    />
                 </CardContent>
             </Card>
 
             <Card>
-                <CardHeader className="flex flex-row items-center justify-between">
+                <CardHeader>
                     <CardTitle className="flex items-center gap-2">
                         <FolderKanban className="h-5 w-5" />
                         Proyectos
                     </CardTitle>
-                    <Button variant="outline" size="sm" onClick={addProject}>
-                        <Plus className="h-4 w-4 mr-1" /> Agregar
-                    </Button>
                 </CardHeader>
-                <CardContent className="space-y-4">
-                    {projects.length === 0 ? (
-                        <p className="text-muted-foreground text-center py-4">No hay proyectos agregados</p>
-                    ) : (
-                        projects.map((proj, index) => (
-                            <div key={index} className="p-4 border rounded-lg space-y-3">
-                                <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                                    <Input
-                                        placeholder="Título del proyecto"
-                                        value={proj.title}
-                                        onChange={(e) => updateProject(index, { ...proj, title: e.target.value })}
-                                    />
-                                    <Input
-                                        placeholder="URL del proyecto"
-                                        value={proj.project_url}
-                                        onChange={(e) => updateProject(index, { ...proj, project_url: e.target.value })}
-                                    />
-                                    <Input
-                                        placeholder="GitHub URL"
-                                        value={proj.github_url}
-                                        onChange={(e) => updateProject(index, { ...proj, github_url: e.target.value })}
-                                    />
-                                </div>
-                                <textarea
-                                    className="flex min-h-[60px] w-full rounded-md border border-input bg-transparent px-3 py-2 text-sm shadow-sm placeholder:text-muted-foreground"
-                                    placeholder="Descripción del proyecto..."
-                                    value={proj.description}
-                                    onChange={(e) => updateProject(index, { ...proj, description: e.target.value })}
-                                />
-                                <div className="flex justify-end">
-                                    <Button variant="ghost" size="sm" onClick={() => removeProject(index)}>
-                                        <Trash2 className="h-4 w-4 text-destructive mr-1" /> Eliminar
-                                    </Button>
-                                </div>
-                            </div>
-                        ))
-                    )}
+                <CardContent>
+                    <ProjectForm
+                        projects={projects}
+                        onAdd={addProject}
+                        onRemove={removeProject}
+                        onUpdate={updateProject}
+                    />
                 </CardContent>
             </Card>
 
